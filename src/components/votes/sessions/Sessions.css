@@ -1,0 +1,14 @@
+.Session-Cards-Title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.Session-Cards {
+    margin-top: 2vh;
+}
+
+.Session-Name {
+    background-color: rgba(126, 126, 126, 0.18);
+}

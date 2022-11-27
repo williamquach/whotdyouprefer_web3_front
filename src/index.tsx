@@ -3,13 +3,19 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { MetaMaskProvider } from "metamask-react";
+import { BrowserRouter } from "react-router-dom";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
 );
 root.render(
     <React.StrictMode>
-        <App />
+        <MetaMaskProvider>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </MetaMaskProvider>
     </React.StrictMode>
 );
 
