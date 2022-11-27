@@ -57,6 +57,11 @@
     color: #61dafb;
 }
 
+.App-Button-Link {
+    color: #ffffff;
+    text-decoration: none;
+}
+
 @keyframes App-logo-spin {
     from {
         transform: rotate(0deg);
@@ -64,4 +69,10 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Mantine overloading */
+.mantine-Container-root {
+    padding-left: 0;
+    padding-right: 0;
 }

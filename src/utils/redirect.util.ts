@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom";
 
 export const redirectByWalletConnectionStatus = (status: string, currentPath: string) => {
     if (shouldRedirectByWalletConnectionStatusAndCurrentPath(status, "connected", currentPath, "/welcome")) {
-        navigateTo("/sessions/opened"); // TODO change bc this will always redirect to /welcome even on sessions vote
+        navigateTo("/welcome");
     } else if (shouldRedirectByWalletConnectionStatusAndCurrentPath(status, "unavailable", currentPath, "/crypto-wallet/unavailable")) {
         navigateTo("/crypto-wallet/unavailable");
-    } else if (shouldRedirectByWalletConnectionStatusAndCurrentPath(status, "initializing", currentPath, "/crypto-wallet/synchronisation")) {
-        navigateTo("/crypto-wallet/synchronisation");
+    } else if (shouldRedirectByWalletConnectionStatusAndCurrentPath(status, "initializing", currentPath, "/crypto-wallet/initializing")) {
+        navigateTo("/crypto-wallet/initializing");
     } else if (shouldRedirectByWalletConnectionStatusAndCurrentPath(status, "notConnected", currentPath, "/crypto-wallet/connect")) {
         navigateTo("/crypto-wallet/connect");
     } else if (shouldRedirectByWalletConnectionStatusAndCurrentPath(status, "connecting", currentPath, "/crypto-wallet/connecting")) {

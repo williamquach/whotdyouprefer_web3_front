@@ -4,7 +4,7 @@ import { useMetaMask } from "metamask-react";
 import { redirectByWalletConnectionStatus } from "../../../utils/redirect.util";
 import metamaskImage from "../../../assets/img/metamask.png";
 
-function Synchronisation() {
+function Initialization() {
     const { status } = useMetaMask();
     redirectByWalletConnectionStatus(status, window.location.pathname);
     return (
@@ -21,4 +21,4 @@ function Synchronisation() {
     );
 }
 
-export default Synchronisation;
+export default Initialization;

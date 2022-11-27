@@ -7,7 +7,7 @@ import { AppHeader } from "./header/AppHeader";
 export function Home() {
     const links = [
         { label: "Accueil", link: "/" },
-        { label: "Historique de vote", link: "/historic" }, // TODO
+        { label: "Historique", link: "/historic" }, // TODO
         { label: "Compte", link: "/account" }  // TODO
     ];
 

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { Burger, Center, Container, createStyles, Group, Header } from "@mantine/core";
+import { Burger, Button, Center, Container, createStyles, Group, Header } from "@mantine/core";
 import { HeaderProps } from "./header-props";
 import logo from "../../../logo.svg";
 import "./AppHeader.css";
+import { navigateTo } from "../../../utils/redirect.util";
 
 const useStyles = createStyles((theme) => ({
     header: {
@@ -55,25 +56,31 @@ export function AppHeader({ links }: HeaderProps) {
     const { classes, cx } = useStyles();
 
     const items = links.map((link) => (
-        <a
+        <Button
             key={link.label}
-            href={link.link}
             className={cx(classes.link, { [classes.linkActive]: active === link.link })}
             onClick={(event) => {
                 event.preventDefault();
+                navigateTo(link.link);
                 setActive(link.link);
             }}
+            variant={active === link.link ? "light" : "subtle"}
+            // color={active === link.link ? "yellow" : "white"}
+            style={active === link.link ? { color: "black", fontWeight: "bold" } : {}}
         >
             {link.label}
-        </a>
+        </Button>
     ));
 
     return (
         <Header height={60} mb={120} className={"App-Header"}>
             <Container className={classes.header}>
                 <Center>
-                    <img src={logo} alt="whotdyouprefer logo" width={40} height={40} />
-                    <strong>whotdyouprefer</strong>
+                    <Button variant="light" style={{ backgroundColor: "transparent", color: "black" }} uppercase
+                        onClick={() => window.location.href = "/"}>
+                        <img src={logo} alt="whotdyouprefer logo" width={40} height={40} style={{ marginRight: 10 }} />
+                        <strong>whotdyouprefer</strong>
+                    </Button>
                 </Center>
                 <Group spacing={5} className={classes.links}>
                     {items}
