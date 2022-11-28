@@ -10,6 +10,9 @@ import Connecting from "./components/metamask/connected/Connecting";
 import NotFound from "./components/errors/NotFound";
 import { Container } from "@mantine/core";
 import { Home } from "./components/Home/Home";
+import SessionHistoryHome from "./components/votes/history/SessionHistoryHome";
+import AccountHome from "./components/user/account/AccountHome";
+import SessionHome from "./components/votes/sessions/details/SessionHome";
 
 function App() {
     const { status, connect } = useMetaMask();
@@ -42,9 +45,10 @@ function App() {
         <Container className="App">
             <Routes>
                 <Route path="/" element={<Home />} />
-                {/*<Route path="/account" element={<Account />} />*/}
-                {/*<Route path="/historic" element={<Historic />} />*/}
                 <Route path="/welcome" element={<Welcome />} />
+                <Route path="/account" element={<AccountHome />} />
+                <Route path="/history" element={<SessionHistoryHome />} />
+                <Route path="/sessions/:id" element={<SessionHome />} />
                 <Route path="/crypto-wallet/unavailable" element={<Unavailable />} />
                 <Route path="/crypto-wallet/initializing" element={<Initialization />} />
                 <Route path="/crypto-wallet/connect" element={<Connect connect={connect} />} />
@@ -55,5 +59,6 @@ function App() {
         </Container>
     );
 }
+
 
 export default App;

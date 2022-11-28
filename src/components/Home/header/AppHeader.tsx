@@ -4,6 +4,7 @@ import { Burger, Button, Center, Container, createStyles, Group, Header } from "
 import { HeaderProps } from "./header-props";
 import logo from "../../../logo.svg";
 import "./AppHeader.css";
+import { useNavigate } from "react-router-dom";
 import { navigateTo } from "../../../utils/redirect.util";
 
 const useStyles = createStyles((theme) => ({
@@ -52,7 +53,9 @@ const useStyles = createStyles((theme) => ({
 
 export function AppHeader({ links }: HeaderProps) {
     const [opened, { toggle }] = useDisclosure(false);
-    const [active, setActive] = useState(links[0].link);
+    const foundCurrentLink = links.find((link) => link.link === window.location.pathname);
+    const [active, setActive] = useState(foundCurrentLink?.link);
+    const navigate = useNavigate();
     const { classes, cx } = useStyles();
 
     const items = links.map((link) => (
@@ -61,12 +64,15 @@ export function AppHeader({ links }: HeaderProps) {
             className={cx(classes.link, { [classes.linkActive]: active === link.link })}
             onClick={(event) => {
                 event.preventDefault();
-                navigateTo(link.link);
+                navigateTo(link.link, navigate);
                 setActive(link.link);
             }}
             variant={active === link.link ? "light" : "subtle"}
-            // color={active === link.link ? "yellow" : "white"}
-            style={active === link.link ? { color: "black", fontWeight: "bold" } : {}}
+            style={active === link.link ? {
+                color: "black",
+                fontWeight: "bold",
+                backgroundColor: "rgba(255,255,255,0.7)"
+            } : {}}
         >
             {link.label}
         </Button>

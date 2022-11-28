@@ -1,6 +1,5 @@
 import React from "react";
 import { Center } from "@mantine/core";
-import "./Sessions.css";
 
 function NoSessions() {
     return (

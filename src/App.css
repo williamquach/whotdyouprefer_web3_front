@@ -20,7 +20,7 @@
 .App-Card {
     background: rgba(224, 224, 224, 0.9);
     padding: 4vh 8vh;
-    margin: 10vh;
+    margin: 0 10vh 10vh 10vh;
 }
 
 .Wallet-Provider-Image {

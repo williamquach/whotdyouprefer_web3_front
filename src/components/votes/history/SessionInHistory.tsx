@@ -1,14 +1,15 @@
 import React from "react";
 import { Card, CardSection, Center, Text } from "@mantine/core";
+import "./SessionHistory.css";
 
-function SessionCard(props: { sessionId: number }) {
+function SessionInHistory(props: { sessionId: number }) {
     return (
         <>
             <Card
                 shadow="sm"
                 p="xl"
                 component="a"
-                href={"/sessions/" + props.sessionId}
+                href="/sessions/{props.sessionId}"
             >
                 <CardSection>
                     <Center className="Session-Name">
@@ -28,4 +29,4 @@ function SessionCard(props: { sessionId: number }) {
     );
 }
 
-export default SessionCard;
+export default SessionInHistory;

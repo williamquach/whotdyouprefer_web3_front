@@ -1,12 +1,10 @@
 import React from "react";
 import { Center, Col, Container, Grid } from "@mantine/core";
-import SessionCard from "./SessionCard";
-import NoSessions from "./NoSessions";
-import "./Sessions.css";
+import SessionInHistory from "./SessionInHistory";
+import NoSessions from "../sessions/NoSessions";
+import "./SessionHistory.css";
 
-function Sessions() {
-    // const { status } = useMetaMask();
-    // redirectByWalletConnectionStatus(status, window.location.pathname);
+function SessionHistory() {
     const sessions: { sessionId: number }[] = [
         {
             sessionId: 1
@@ -28,7 +26,7 @@ function Sessions() {
         <>
             <Container>
                 <Center>
-                    <h1 className="Session-Cards-Title">Sessions de vote ouvertes</h1>
+                    <h1 className="Session-Cards-Title">Historique de vote</h1>
                 </Center>
                 {sessions.length === 0 && (
                     <NoSessions />
@@ -37,7 +35,7 @@ function Sessions() {
                     <Grid className="Session-Cards" gutter="lg">
                         {sessions.map((session) => (
                             <Col md={6} lg={6}>
-                                <SessionCard sessionId={session.sessionId} />
+                                <SessionInHistory sessionId={session.sessionId} />
                             </Col>
                         ))}
                     </Grid>
@@ -47,4 +45,4 @@ function Sessions() {
     );
 }
 
-export default Sessions;
+export default SessionHistory;

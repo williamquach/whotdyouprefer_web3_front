@@ -4,16 +4,17 @@ import Sessions from "../votes/sessions/Sessions";
 import "./Home.css";
 import { AppHeader } from "./header/AppHeader";
 
+export const headerLinks = [
+    { label: "Accueil", link: "/" },
+    { label: "Historique", link: "/history" }, // TODO
+    { label: "Compte", link: "/account" }  // TODO
+];
+
 export function Home() {
-    const links = [
-        { label: "Accueil", link: "/" },
-        { label: "Historique", link: "/historic" }, // TODO
-        { label: "Compte", link: "/account" }  // TODO
-    ];
 
     return (
         <>
-            <AppHeader links={links} />
+            <AppHeader links={headerLinks} />
             <Container className="Main-Page-Container" size="lg">
                 <Sessions />
             </Container>
