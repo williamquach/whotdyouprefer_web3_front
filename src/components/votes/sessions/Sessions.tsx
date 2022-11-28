@@ -3,25 +3,33 @@ import { Center, Col, Container, Grid } from "@mantine/core";
 import SessionCard from "./SessionCard";
 import NoSessions from "./NoSessions";
 import "./Sessions.css";
+import { orderSessionsFromNewestToOldest, Session } from "../../../models/sessions/session.model";
 
 function Sessions() {
-    // const { status } = useMetaMask();
-    // redirectByWalletConnectionStatus(status, window.location.pathname);
-    const sessions: { sessionId: number }[] = [
+    const sessions: Session[] = [
         {
-            sessionId: 1
+            sessionId: 1,
+            label: "The best session ever",
+            description: "This is the best session ever",
+            expiresAt: new Date("2021-06-06T00:00:00.000Z")
         },
         {
-            sessionId: 2
+            sessionId: 2,
+            label: "Qu'est ce que je fais aujoud'hui",
+            description: "Je ne sais pas ce que je fais aujoud'hui, aidez moi à choisir",
+            expiresAt: new Date("2021-06-01T00:00:00.000Z")
         },
         {
-            sessionId: 3
+            sessionId: 3,
+            label: "J'achète un nouveau téléphone",
+            description: "Dites moi quel téléphone je dois acheter",
+            expiresAt: new Date("2021-06-02T00:00:00.000Z")
         },
         {
-            sessionId: 4
-        },
-        {
-            sessionId: 5
+            sessionId: 4,
+            label: "Meilleur sneakers",
+            description: "Quelle sneakers est la meilleure d'après vous ?",
+            expiresAt: new Date("2012-06-03T00:00:00.000Z")
         }
     ];
     return (
@@ -35,9 +43,9 @@ function Sessions() {
                 )}
                 {sessions.length > 0 && (
                     <Grid className="Session-Cards" gutter="lg">
-                        {sessions.map((session) => (
+                        {orderSessionsFromNewestToOldest(sessions).map((session) => (
                             <Col md={6} lg={6}>
-                                <SessionCard sessionId={session.sessionId} />
+                                <SessionCard session={session} />
                             </Col>
                         ))}
                     </Grid>

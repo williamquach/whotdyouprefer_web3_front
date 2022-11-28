@@ -3,23 +3,21 @@ import { Center, Col, Container, Grid } from "@mantine/core";
 import SessionInHistory from "./SessionInHistory";
 import NoSessions from "../sessions/NoSessions";
 import "./SessionHistory.css";
+import { orderSessionsFromNewestToOldest, Session } from "../../../models/sessions/session.model";
 
 function SessionHistory() {
-    const sessions: { sessionId: number }[] = [
+    const sessions: Session[] = [
         {
-            sessionId: 1
+            sessionId: 1,
+            label: "La meilleure pizza",
+            description: "Votez pour la meilleure pizza",
+            expiresAt: new Date("2018-06-06T00:00:00.000Z")
         },
         {
-            sessionId: 2
-        },
-        {
-            sessionId: 3
-        },
-        {
-            sessionId: 4
-        },
-        {
-            sessionId: 5
+            sessionId: 4,
+            label: "Délégués 5AL1 - ESGI",
+            description: "Qui sera le meilleur délégué de la promo 5AL1 ?",
+            expiresAt: new Date("2012-06-03T00:00:00.000Z")
         }
     ];
     return (
@@ -33,9 +31,9 @@ function SessionHistory() {
                 )}
                 {sessions.length > 0 && (
                     <Grid className="Session-Cards" gutter="lg">
-                        {sessions.map((session) => (
+                        {orderSessionsFromNewestToOldest(sessions).map((session) => (
                             <Col md={6} lg={6}>
-                                <SessionInHistory sessionId={session.sessionId} />
+                                <SessionInHistory session={session} />
                             </Col>
                         ))}
                     </Grid>

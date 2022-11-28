@@ -3,7 +3,7 @@ import { Container } from "@mantine/core";
 import "./SessionHome.css";
 import { AppHeader } from "../../../Home/header/AppHeader";
 import { headerLinks } from "../../../Home/Home";
-import Session from "./Session";
+import SessionDetails from "./SessionDetails";
 import { useParams } from "react-router-dom";
 
 function SessionHome() {
@@ -13,7 +13,7 @@ function SessionHome() {
         <>
             <AppHeader links={headerLinks} />
             <Container className="Main-Page-Container" size="lg">
-                <Session sessionId={parseInt(sessionId)} />
+                <SessionDetails sessionId={parseInt(sessionId)} />
             </Container>
         </>
     );

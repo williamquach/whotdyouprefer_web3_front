@@ -1,27 +1,28 @@
 import React from "react";
 import { Card, CardSection, Center, Text } from "@mantine/core";
+import { Session } from "../../../models/sessions/session.model";
 
-function SessionCard(props: { sessionId: number }) {
+function SessionCard(props: { session: Session }) {
     return (
         <>
             <Card
                 shadow="sm"
                 p="xl"
                 component="a"
-                href={"/sessions/" + props.sessionId}
+                href={"/sessions/" + props.session.sessionId}
             >
                 <CardSection>
                     <Center className="Session-Name">
-                        <h1>Session {props.sessionId}</h1>
+                        <h1>{props.session.label}</h1>
                     </Center>
                 </CardSection>
 
                 <Text weight={500} size="lg" mt="md">
-          You&apos;ve won a million dollars in cash!
+                    {props.session.description}
                 </Text>
 
                 <Text mt="xs" color="dimmed" size="sm">
-          Please click anywhere on this card to claim your reward, this is not a fraud, trust us
+                    <p>Date : {props.session.expiresAt.toDateString()}</p>
                 </Text>
             </Card>
         </>

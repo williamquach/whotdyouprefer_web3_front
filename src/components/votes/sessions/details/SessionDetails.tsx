@@ -2,7 +2,7 @@ import React from "react";
 import { Center, Container } from "@mantine/core";
 import "./Session.css";
 
-function Session(props: { sessionId: number }) {
+function SessionDetails(props: { sessionId: number }) {
     return (
         <>
             <Container>
@@ -14,4 +14,4 @@ function Session(props: { sessionId: number }) {
     );
 }
 
-export default Session;
+export default SessionDetails;
