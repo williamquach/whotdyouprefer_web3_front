@@ -1,13 +1,31 @@
 import React, { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { Burger, Button, Center, Container, createStyles, Group, Header } from "@mantine/core";
+import { Burger, Button, Center, Container, createStyles, Group, Header, Paper, Transition } from "@mantine/core";
 import { HeaderProps } from "./header-props";
 import logo from "../../../logo.svg";
 import "./AppHeader.css";
 import { useNavigate } from "react-router-dom";
 import { navigateTo } from "../../../utils/redirect.util";
 
+const HEADER_HEIGHT = 60;
+
 const useStyles = createStyles((theme) => ({
+    dropdown: {
+        position: "absolute",
+        top: HEADER_HEIGHT,
+        left: 0,
+        right: 0,
+        zIndex: 0,
+        borderTopRightRadius: 0,
+        borderTopLeftRadius: 0,
+        borderTopWidth: 0,
+        overflow: "hidden",
+
+        [theme.fn.largerThan("xs")]: {
+            display: "none"
+        }
+    },
+
     header: {
         display: "flex",
         justifyContent: "space-between",
@@ -28,17 +46,24 @@ const useStyles = createStyles((theme) => ({
     },
 
     link: {
-        display: "block",
+        display: "block !important",
         lineHeight: 1,
-        padding: "8px 12px",
+        padding: "8px 12px !important",
         borderRadius: theme.radius.sm,
         textDecoration: "none",
+        textAlign: "center",
         color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.colors.gray[7],
         fontSize: theme.fontSizes.sm,
         fontWeight: 500,
 
+
         "&:hover": {
             backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0]
+        },
+
+        [theme.fn.smallerThan("sm")]: {
+            borderRadius: 0,
+            padding: theme.spacing.md
         }
     },
 
@@ -79,7 +104,8 @@ export function AppHeader({ links }: HeaderProps) {
     ));
 
     return (
-        <Header height={60} mb={120} className={"App-Header"}>
+    // <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
+        <Header height={HEADER_HEIGHT} mb={120} className={"App-Header"}>
             <Container className={classes.header}>
                 <Center>
                     <Button variant="light" style={{ backgroundColor: "transparent", color: "black" }} uppercase
@@ -88,11 +114,20 @@ export function AppHeader({ links }: HeaderProps) {
                         <strong>whotdyouprefer</strong>
                     </Button>
                 </Center>
+
                 <Group spacing={5} className={classes.links}>
                     {items}
                 </Group>
 
                 <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
+
+                <Transition transition="pop-top-right" duration={200} mounted={opened}>
+                    {(styles) => (
+                        <Paper className={classes.dropdown} withBorder style={styles}>
+                            {items}
+                        </Paper>
+                    )}
+                </Transition>
             </Container>
         </Header>
     );
