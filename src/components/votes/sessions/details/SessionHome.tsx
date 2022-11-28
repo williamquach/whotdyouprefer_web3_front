@@ -5,15 +5,16 @@ import { AppHeader } from "../../../Home/header/AppHeader";
 import { headerLinks } from "../../../Home/Home";
 import SessionDetails from "./SessionDetails";
 import { useParams } from "react-router-dom";
+import { findSessionById } from "./session.service";
 
 function SessionHome() {
     const sessionId = useParams().sessionId ?? "0";
-    console.log("SessionHome sessionId: " + sessionId);
+    const session = findSessionById(parseInt(sessionId));
     return (
         <>
             <AppHeader links={headerLinks} />
             <Container className="Main-Page-Container" size="lg">
-                <SessionDetails sessionId={parseInt(sessionId)} />
+                <SessionDetails session={session} />
             </Container>
         </>
     );

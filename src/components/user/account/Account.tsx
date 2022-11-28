@@ -3,7 +3,7 @@ import { Center, Container } from "@mantine/core";
 import { useConnectedMetaMask } from "metamask-react";
 
 function Account() {
-    const { account, chainId, status, ethereum } = useConnectedMetaMask();
+    const { account, chainId, status } = useConnectedMetaMask();
     return (
         <>
             <Container>
