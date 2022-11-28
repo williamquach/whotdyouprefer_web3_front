@@ -23,7 +23,7 @@ function SessionInHistory(props: { session: Session }) {
                 </Text>
 
                 <Text mt="xs" color="dimmed" size="sm">
-                    <p>Date : {props.session.expiresAt.toDateString()}</p>
+                    <p>Fermée : {props.session.expiresAt.toDateString()}</p>
                 </Text>
             </Card>
         </>
