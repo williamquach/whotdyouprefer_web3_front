@@ -7,6 +7,6 @@ export class SessionChoice {
 }
 
 
-export const orderSessionChoicesOrderIdAscendant = (sessions: SessionChoice[]): SessionChoice[] => {
+export const orderSessionChoicesByIdAsc = (sessions: SessionChoice[]): SessionChoice[] => {
     return sessions.sort((a, b) => a.id - b.id);
 };

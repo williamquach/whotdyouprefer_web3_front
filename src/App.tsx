@@ -13,6 +13,7 @@ import { Home } from "./components/Home/Home";
 import SessionHistoryHome from "./components/votes/history/SessionHistoryHome";
 import AccountHome from "./components/user/account/AccountHome";
 import SessionHome from "./components/votes/sessions/details/SessionHome";
+import SessionClosedHome from "./components/votes/history/details/SessionClosedHome";
 
 function App() {
     const { status, connect } = useMetaMask();
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/account" element={<AccountHome />} />
                 <Route path="/history" element={<SessionHistoryHome />} />
                 <Route path="/sessions/:id" element={<SessionHome />} />
+                <Route path="/sessions/closed/:id" element={<SessionClosedHome />} /> {/* TODO */}
                 <Route path="/crypto-wallet/unavailable" element={<Unavailable />} />
                 <Route path="/crypto-wallet/initializing" element={<Initialization />} />
                 <Route path="/crypto-wallet/connect" element={<Connect connect={connect} />} />

@@ -1,34 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Center, Chip, Container } from "@mantine/core";
-import "./Session.css";
-import { orderSessionChoicesByIdAsc, SessionChoice } from "../../../../models/sessions/session-choice.model";
-import { Session } from "../../../../models/sessions/session.model";
+import "./SessionClosed.css";
 import { useNavigate } from "react-router-dom";
+import { SessionClosed } from "../../../../models/sessions/session-closed.model";
+import { orderSessionClosedChoicesByRankAsc } from "../../../../models/sessions/session-closed-choice.model";
 
-function SessionDetails(props: { session: Session }) {
-    const choices: SessionChoice[] = [
-        {
-            id: 1,
-            label: "Pizza 4 fromages"
-        },
-        {
-            id: 2,
-            label: "Pizza 4 saisons"
-        },
-        {
-            id: 3,
-            label: "Pizza 4 saisons"
-        },
-        {
-            id: 4,
-            label: "Pizza 4 saisons"
-        }
-    ];
-    const [value, setValue] = useState((choices[0].id).toString());
-
-    const sendVote = () => {
-        console.log("Vote envoyé : " + value);
-    };
+function SessionClosedDetails(props: { session: SessionClosed }) {
+    const userVoteChoiceId = props.session.userChoiceId;
 
     const navigate = useNavigate();
     const goBack = () => {
@@ -55,25 +33,26 @@ function SessionDetails(props: { session: Session }) {
                 <Container className="Session-Details-Container">
                     <Center>
                         <p className="Session-Details-Description">
-                            <strong>Date de fin : </strong>
+                            <strong>Fermeture : </strong>
                             {props.session.expiresAt.toLocaleString()}
                         </p>
                     </Center>
                     <Center>
                         <h2>Choix : </h2>
                     </Center>
-                    <Chip.Group position="center" multiple={false} value={value} onChange={setValue}>
-                        {orderSessionChoicesByIdAsc(choices).map((choice) => (
+                    <Chip.Group position="center" multiple={false} value={userVoteChoiceId.toString()}>
+                        {orderSessionClosedChoicesByRankAsc(props.session.choices).map((choice) => (
                             <>
-                                <Chip key={choice.id.toString()} value={choice.id.toString()}>{choice.label}</Chip>
+                                <Chip key={choice.id.toString()} value={choice.id.toString()}>
+                                    {choice.label} (Nombre de votes : {choice.votesCount})
+                                </Chip>
                             </>
                         ))}
                     </Chip.Group>
-                    <Button className="Vote-Button" onClick={sendVote}>Voter</Button>
                 </Container>
             </Container>
         </>
     );
 }
 
-export default SessionDetails;
+export default SessionClosedDetails;

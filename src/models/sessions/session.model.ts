@@ -8,7 +8,6 @@ export class Session {
     }
 }
 
-
 export const orderSessionsFromNewestToOldest = (sessions: Session[]): Session[] => {
     return sessions.sort((a, b) => b.expiresAt.getTime() - a.expiresAt.getTime());
 };

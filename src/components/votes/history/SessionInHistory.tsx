@@ -4,13 +4,19 @@ import "./SessionHistory.css";
 import { Session } from "../../../models/sessions/session.model";
 
 function SessionInHistory(props: { session: Session }) {
+    const goToSessionClosedDetails = (session: Session) => {
+        console.log("goToSessionClosedDetails : " + session);
+    };
     return (
         <>
             <Card
                 shadow="sm"
                 p="xl"
                 component="a"
-                href={"/sessions/" + props.session.sessionId}
+                onClick={() => {
+                    goToSessionClosedDetails(props.session);
+                }}
+                href={"/sessions/closed/" + props.session.sessionId}
             >
                 <CardSection>
                     <Center className="Session-Name">
