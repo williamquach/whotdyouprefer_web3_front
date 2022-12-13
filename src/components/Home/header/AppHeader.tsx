@@ -28,7 +28,7 @@ const useStyles = createStyles((theme) => ({
 
     header: {
         display: "flex",
-        justifyContent: "space-between",
+        // justifyContent: "space-between",
         alignItems: "center",
         height: "100%"
     },
@@ -114,10 +114,10 @@ export function AppHeader({ links }: HeaderProps) {
                         <strong>whotdyouprefer</strong>
                     </Button>
                 </Center>
-
                 <Group spacing={5} className={classes.links}>
                     {items}
                 </Group>
+
 
                 <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
 

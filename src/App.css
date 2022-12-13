@@ -26,6 +26,7 @@
 .Wallet-Provider-Image {
     height: 20vmin;
     pointer-events: none;
+    margin: 2vh;
 }
 
 @media (prefers-reduced-motion: no-preference) {
