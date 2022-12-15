@@ -5,9 +5,10 @@ import "./Home.css";
 import { AppHeader } from "./header/AppHeader";
 
 export const headerLinks = [
-    { label: "Accueil", link: "/" },
-    { label: "Historique", link: "/history" },
-    { label: "Compte", link: "/account" }
+    { label: "🏠 Accueil", link: "/" },
+    { label: "➕ Créer une session de vote", link: "/sessions/create" },
+    { label: "📖 Historique", link: "/history" },
+    { label: "🫵 Compte", link: "/account" }
 ];
 
 export function Home() {

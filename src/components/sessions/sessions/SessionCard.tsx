@@ -1,15 +1,21 @@
 import React from "react";
 import { Card, CardSection, Center, Text } from "@mantine/core";
 import { Session } from "../../../models/sessions/session.model";
+import { useNavigate } from "react-router-dom";
+import { navigateTo } from "../../../utils/redirect.util";
 
 function SessionCard(props: { session: Session }) {
+    const navigate = useNavigate();
     return (
         <>
             <Card
                 shadow="sm"
                 p="xl"
                 component="a"
-                href={"/sessions/" + props.session.sessionId}
+                href="#"
+                onClick={() => {
+                    navigateTo("/sessions/" + props.session.sessionId, navigate);
+                }}
             >
                 <CardSection>
                     <Center className="Session-Name">

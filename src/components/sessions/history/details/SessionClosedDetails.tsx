@@ -4,13 +4,14 @@ import "./SessionClosed.css";
 import { useNavigate } from "react-router-dom";
 import { SessionClosed } from "../../../../models/sessions/session-closed.model";
 import { orderSessionClosedChoicesByRankAsc } from "../../../../models/sessions/session-closed-choice.model";
+import { navigateTo } from "../../../../utils/redirect.util";
 
 function SessionClosedDetails(props: { session: SessionClosed }) {
     const userVoteChoiceId = props.session.userChoiceId;
 
     const navigate = useNavigate();
     const goBack = () => {
-        navigate(-1);
+        navigateTo("/history", navigate);
     };
 
     return (
@@ -24,7 +25,7 @@ function SessionClosedDetails(props: { session: SessionClosed }) {
                     }}
                     style={{ marginTop: "2vh" }}
                 >
-          Retour
+                    Retour
                 </Button>
 
                 <Center>

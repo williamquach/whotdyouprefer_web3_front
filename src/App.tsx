@@ -9,10 +9,17 @@ import { Container } from "@mantine/core";
 import { Home } from "./components/Home/Home";
 import SessionHistoryHome from "./components/sessions/history/SessionHistoryHome";
 import AccountHome from "./components/user/account/AccountHome";
-import SessionHome from "./components/sessions/sessions/details/SessionHome";
+import SessionDetailsHome from "./components/sessions/sessions/details/SessionDetailsHome";
 import SessionClosedHome from "./components/sessions/history/details/SessionClosedHome";
 import injectedModule from "@web3-onboard/injected-wallets";
 import { init, useConnectWallet } from "@web3-onboard/react";
+import SessionCreateHome from "./components/sessions/sessions/create/SessionCreateHome";
+import LocalizedFormat from "dayjs/plugin/localizedFormat";
+import dayjs from "dayjs";
+import "dayjs/locale/fr";
+
+dayjs.locale("fr");
+dayjs.extend(LocalizedFormat);
 
 const injected = injectedModule();
 // const MAINNET_RPC_URL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
@@ -48,13 +55,9 @@ function App() {
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/account" element={<AccountHome />} />
                     <Route path="/history" element={<SessionHistoryHome />} />
-                    <Route path="/sessions/:id" element={<SessionHome />} />
-                    <Route path="/sessions/closed/:id" element={<SessionClosedHome />} />
-                    {/*<Route path="/crypto-wallet/unavailable" element={<Unavailable />} />*/}
-                    {/*<Route path="/crypto-wallet/initializing" element={<Initialization />} />*/}
-                    {/*<Route path="/crypto-wallet/connect" element={<Connect connect={connect} />} />*/}
-                    {/*<Route path="/crypto-wallet/connecting" element={<Connecting />} />*/}
-                    {/*<Route path="/sessions/opened" element={<Sessions />} />*/}
+                    <Route path="/sessions/create" element={<SessionCreateHome />} />
+                    <Route path="/sessions/:sessionId" element={<SessionDetailsHome />} />
+                    <Route path="/sessions/closed/:sessionId" element={<SessionClosedHome />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </Container>

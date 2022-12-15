@@ -1,9 +1,12 @@
+import { SessionChoice } from "./session-choice.model";
+
 export class Session {
     constructor(
-    public sessionId: number,
-    public label: string,
-    public expiresAt: Date,
-    public description?: string
+        public sessionId: number,
+        public label: string,
+        public expiresAt: Date,
+        public description?: string,
+        public choices: SessionChoice[] = []
     ) {
     }
 }

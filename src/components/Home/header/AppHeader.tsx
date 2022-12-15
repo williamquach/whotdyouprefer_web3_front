@@ -104,12 +104,12 @@ export function AppHeader({ links }: HeaderProps) {
     ));
 
     return (
-    // <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
+        // <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
         <Header height={HEADER_HEIGHT} mb={120} className={"App-Header"}>
             <Container className={classes.header}>
                 <Center>
                     <Button variant="light" style={{ backgroundColor: "transparent", color: "black" }} uppercase
-                        onClick={() => window.location.href = "/"}>
+                        onClick={() => navigateTo("/", navigate)}>
                         <img src={logo} alt="whotdyouprefer logo" width={40} height={40} style={{ marginRight: 10 }} />
                         <strong>whotdyouprefer</strong>
                     </Button>

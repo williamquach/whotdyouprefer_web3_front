@@ -6,31 +6,16 @@ import "./SessionHistory.css";
 import { orderSessionsFromNewestToOldest, Session } from "../../../models/sessions/session.model";
 import { useConnectWallet } from "@web3-onboard/react";
 import { SmartContractService } from "../../../smart-contracts/smart-contract-service";
-import { SessionService } from "../sessions/SessionService";
+import { SessionService } from "../../../services/session.service";
 
 function SessionHistory() {
-    // const sessions: Session[] = [
-    //     {
-    //         sessionId: 1,
-    //         label: "La meilleure pizza",
-    //         description: "Votez pour la meilleure pizza",
-    //         expiresAt: new Date("2018-06-06T00:00:00.000Z")
-    //     },
-    //     {
-    //         sessionId: 4,
-    //         label: "Délégués 5AL1 - ESGI",
-    //         description: "Qui sera le meilleur délégué de la promo 5AL1 ?",
-    //         expiresAt: new Date("2012-06-03T00:00:00.000Z")
-    //     }
-    // ];
-
     const [{ wallet }] = useConnectWallet();
     const [closedSessions, setClosedSessions] = useState<Session[]>([]);
 
     const getClosedSessions = async () => {
         if (wallet) {
-            const { readContract } = await SmartContractService.load(wallet, window);
-            const foundClosedSessions = await SessionService.getClosedSessions(readContract);
+            const { contract } = await SmartContractService.load(wallet, window);
+            const foundClosedSessions = await SessionService.getClosedSessions(contract);
             setClosedSessions(foundClosedSessions);
         }
     };
