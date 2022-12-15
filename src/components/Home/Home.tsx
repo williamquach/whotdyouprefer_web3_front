@@ -1,13 +1,13 @@
 import React from "react";
 import { Container } from "@mantine/core";
-import Sessions from "../votes/sessions/Sessions";
+import Sessions from "../sessions/sessions/Sessions";
 import "./Home.css";
 import { AppHeader } from "./header/AppHeader";
 
 export const headerLinks = [
     { label: "Accueil", link: "/" },
-    { label: "Historique", link: "/history" }, // TODO
-    { label: "Compte", link: "/account" }  // TODO
+    { label: "Historique", link: "/history" },
+    { label: "Compte", link: "/account" }
 ];
 
 export function Home() {
