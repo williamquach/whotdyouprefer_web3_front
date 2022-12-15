@@ -15,7 +15,9 @@ import injectedModule from "@web3-onboard/injected-wallets";
 import { init, useConnectWallet } from "@web3-onboard/react";
 
 const injected = injectedModule();
-const MAINNET_RPC_URL = "https://mainnet.infura.io/v3/<INFURA_KEY>";
+// const MAINNET_RPC_URL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
+// const MAINNET_RPC_URL = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`;
+const MAINNET_RPC_URL = `http://localhost:8545`;
 
 init({
     wallets: [injected],
@@ -47,7 +49,7 @@ function App() {
                     <Route path="/account" element={<AccountHome />} />
                     <Route path="/history" element={<SessionHistoryHome />} />
                     <Route path="/sessions/:id" element={<SessionHome />} />
-                    <Route path="/sessions/closed/:id" element={<SessionClosedHome />} /> {/* TODO */}
+                    <Route path="/sessions/closed/:id" element={<SessionClosedHome />} />
                     {/*<Route path="/crypto-wallet/unavailable" element={<Unavailable />} />*/}
                     {/*<Route path="/crypto-wallet/initializing" element={<Initialization />} />*/}
                     {/*<Route path="/crypto-wallet/connect" element={<Connect connect={connect} />} />*/}
