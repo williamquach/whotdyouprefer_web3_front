@@ -3,8 +3,7 @@ export class ContractSession {
         public sessionId: number,
         public label: string,
         public description: string = "",
-        public endDateTime: any,
-        public choices: string[]
+        public endDateTime: any
     ) {
     }
 }

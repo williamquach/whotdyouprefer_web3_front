@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Center, Col, Container, Grid, TextInput } from "@mantine/core";
+import { Button, Center, Col, Container, Grid, LoadingOverlay, TextInput } from "@mantine/core";
 import "./SessionCreate.css";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -17,35 +17,67 @@ function SessionCreate() {
     const [sessionEndDate, setSessionEndDate] = useState<Date | null>(dayjs().add(1, "day").toDate());
     const [sessionEndTime, setSessionEndTime] = useState<Date>(dayjs().hour(0).minute(0).toDate());
     const [sessionChoices, setSessionChoices] = useState<Array<string>>(["", "", "", ""]);
+    const [sessionIsBeingCreated, setSessionIsBeingCreated] = useState<boolean>(false);
+    const [sessionCreationError, setSessionCreationError] = useState<boolean>();
+
     const [{ wallet }] = useConnectWallet();
     const navigate = useNavigate();
 
     const createSession = async () => {
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet, window);
-            await SessionService.createSession(contract, {
-                label: sessionName,
-                description: sessionDescription,
-                expiresAt: dayjs(sessionEndDate).hour(dayjs(sessionEndTime).hour()).minute(dayjs(sessionEndTime).minute()).toDate(),
-                choices: sessionChoices
-            });
-            SmartContractService.listenToEvent(contract, "NewSession", (sessionId, label, description, endDateTime, choices) => {
-                // console.log("New session created", sessionId, label, description, endDateTime, choices);
-                showNotification({
-                    title: "Session créée",
-                    message: "La session devrait être disponible à l'accueil ☺️",
-                    color: "green",
-                    /*    icon={<IconCheck size={20} />}*/
-                    icon: <IconCheck size={20} />,
-                    autoClose: 2500
+            const { contract } = await SmartContractService.load(wallet);
+            setSessionIsBeingCreated(true);
+            try {
+                await SessionService.createSession(contract, {
+                    label: sessionName,
+                    description: sessionDescription,
+                    expiresAt: dayjs(sessionEndDate).hour(dayjs(sessionEndTime).hour()).minute(dayjs(sessionEndTime).minute()).toDate(),
+                    choices: sessionChoices
                 });
-                navigateTo("/", navigate);
-            });
+                setSessionIsBeingCreated(false);
+                SmartContractService.listenToEvent(contract, "NewSession", (sessionId, label, description, endDateTime, choices) => {
+                    showNotification({
+                        title: "Session créée",
+                        message: "La session devrait être disponible à l'accueil ☺️",
+                        color: "green",
+                        /*    icon={<IconCheck size={20} />}*/
+                        icon: <IconCheck size={20} />,
+                        autoClose: 2500,
+                        onClose() {
+                            navigateTo("/", navigate);
+                        }
+                    });
+                });
+            } catch (e) {
+                setSessionIsBeingCreated(false);
+                setSessionCreationError(true);
+                console.error(e);
+            }
         }
     };
     return (
         <>
             <Container>
+                {sessionIsBeingCreated && (
+                    <>
+                        <Center>
+                            <h3 className="Session-Title">Création de la session en cours...</h3>
+                        </Center>
+                        <LoadingOverlay
+                            loaderProps={{ size: "lg", color: "pink", variant: "dots" }}
+                            overlayOpacity={0.3}
+                            overlayColor="#c5c5c5"
+                            visible
+                        />
+                    </>
+                )}
+                {sessionCreationError && (
+                    <>
+                        <Center>
+                            <h3 className="Session-Title">Erreur lors de la création de la session</h3>
+                        </Center>
+                    </>
+                )}
                 <Center>
                     <h1 className="Session-Cards-Title">Création d'une session de vote</h1>
                 </Center>

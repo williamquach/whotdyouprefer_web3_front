@@ -14,7 +14,7 @@ function SessionHistory() {
 
     const getClosedSessions = async () => {
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet, window);
+            const { contract } = await SmartContractService.load(wallet);
             const foundClosedSessions = await SessionService.getClosedSessions(contract);
             setClosedSessions(foundClosedSessions);
         }

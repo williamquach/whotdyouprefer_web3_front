@@ -1,4 +1,5 @@
 import { SessionChoice } from "./session-choice.model";
+import { SessionVote } from "./session-vote.model";
 
 export class Session {
     constructor(
@@ -6,7 +7,9 @@ export class Session {
         public label: string,
         public expiresAt: Date,
         public description?: string,
-        public choices: SessionChoice[] = []
+        public choices: SessionChoice[] = [],
+        public hasVoted: boolean = false,
+        public vote: SessionVote = { choiceIds: [], sessionId: -1 }
     ) {
     }
 }

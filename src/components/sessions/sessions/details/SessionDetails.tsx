@@ -1,43 +1,138 @@
-import React, { useState } from "react";
-import { Button, Center, Chip, Container } from "@mantine/core";
+import React, { useEffect, useState } from "react";
+import { Button, Center, Chip, Container, LoadingOverlay, Menu } from "@mantine/core";
 import "./Session.css";
-import { orderSessionChoicesByIdAsc, SessionChoice } from "../../../../models/sessions/session-choice.model";
+import { orderSessionChoicesByIdAsc } from "../../../../models/sessions/session-choice.model";
 import { Session } from "../../../../models/sessions/session.model";
 import { useNavigate } from "react-router-dom";
+import { navigateTo } from "../../../../utils/redirect.util";
+import { SmartContractService } from "../../../../smart-contracts/smart-contract-service";
+import { SessionService } from "../../../../services/session.service";
+import { useConnectWallet } from "@web3-onboard/react";
+import dayjs from "dayjs";
+import { showNotification } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons";
+import Label = Menu.Label;
 
-function SessionDetails(props: { session: Session }) {
-    const choices: SessionChoice[] = [
-        {
-            id: 1,
-            label: "Pizza 4 fromages"
-        },
-        {
-            id: 2,
-            label: "Pizza 4 saisons"
-        },
-        {
-            id: 3,
-            label: "Pizza 4 saisons"
-        },
-        {
-            id: 4,
-            label: "Pizza 4 saisons"
-        }
-    ];
-    const [value, setValue] = useState((choices[0].id).toString());
-
-    const sendVote = () => {
-        console.log("Vote envoyé : " + value);
-    };
-
+function SessionDetails(props: { sessionId: number }) {
     const navigate = useNavigate();
     const goBack = () => {
-        navigate(-1);
+        navigateTo("/", navigate);
+    };
+
+    const [{ wallet }] = useConnectWallet();
+    const [sessionLoadError, setSessionLoadError] = useState<boolean>();
+    const [session, setSession] = useState<Session | undefined>();
+    const [preferenceCount, setPreferenceCount] = useState<number>(0);
+    const [preferences, setPreferences] = useState<(number | undefined)[]>([]);
+    const [voteIsBeingSent, setVoteIsBeingSent] = useState<boolean>(false);
+
+    const findSessionById = async () => {
+        if (wallet) {
+            const { contract } = await SmartContractService.load(wallet);
+            try {
+                const foundOpenedSessions = await SessionService.findSessionById(contract, props.sessionId);
+                setSession(foundOpenedSessions);
+                setPreferenceCount(foundOpenedSessions.choices.length);
+                setPreferences(Array.from(Array(preferenceCount).map(() => undefined)));
+            } catch (error) {
+                setSessionLoadError(true);
+                showNotification({
+                    title: "Erreur",
+                    message: "Impossible de charger la session de vote",
+                    color: "red",
+                    icon: <IconX size={24} />
+                });
+            }
+        }
+    };
+
+    const unselectAlreadySelectedPreferences = (newPreferences: (number | undefined)[], choiceId: number): (number | undefined)[] => {
+        return preferences.map((preference) => {
+            if (preference === choiceId) {
+                return undefined;
+            }
+            return preference;
+        });
+    };
+    const updatePreferences = (preferenceIndex: number, choiceId: string) => {
+        const newPreferences = unselectAlreadySelectedPreferences(preferences, parseInt(choiceId));
+        newPreferences[preferenceIndex] = parseInt(choiceId);
+        setPreferences(newPreferences);
+    };
+
+    useEffect(() => {
+        findSessionById()
+            .then(() => console.log("Session loaded"))
+            .catch((error) => console.error("Error while loading session details", error));
+    }, [wallet]);
+
+    const sendVote = async () => {
+        if (!session) {
+            alert("Session not set ???? Why you vote ? What are you doing ????");
+            return;
+        }
+        if (preferences.length === 0) {
+            showNotification({
+                title: "Attention",
+                message: "Vous devez choisir au moins une préférence",
+                color: "red",
+                autoClose: 2500
+            });
+            return;
+        }
+        const isAllChoicePutInPreferences = preferences.find((preference) => {
+            return preference === undefined;
+        });
+        if (isAllChoicePutInPreferences !== undefined) {
+            showNotification({
+                title: "Attention",
+                message: "Vous devez faire un choix pour chaque préférence",
+                color: "red",
+                autoClose: 4000
+            });
+            return;
+        }
+
+        const formattedPreferences = preferences.map((preference) => {
+            if (preference == undefined) {
+                throw new Error("A preference is undefined bro");
+            }
+            return preference;
+        });
+        setVoteIsBeingSent(true);
+        const { contract } = await SmartContractService.load(wallet);
+        await SessionService.vote(contract, session.sessionId, formattedPreferences.map((preference) => preference));
+        setVoteIsBeingSent(false);
+
+        SmartContractService.listenToEvent(contract, "NewVote", (voteId, sessionId, choiceIds) => {
+            showNotification({
+                title: "Vote envoyé",
+                message: `Votre vote a bien été envoyé pour la session : '${session.label}'`,
+                color: "green",
+                icon: <IconCheck size={20} />,
+                autoClose: 2500,
+                onClose: () => {
+                    navigateTo("/", navigate);
+                }
+            });
+            navigateTo("/", navigate);
+        });
+
     };
 
     return (
         <>
             <Container>
+                {voteIsBeingSent && (
+                    <>
+                        <LoadingOverlay
+                            loaderProps={{ size: "lg", color: "pink", variant: "dots" }}
+                            overlayOpacity={0.3}
+                            overlayColor="#c5c5c5"
+                            visible
+                        />
+                    </>
+                )}
                 <Button
                     variant="outline"
                     color="gray"
@@ -46,31 +141,92 @@ function SessionDetails(props: { session: Session }) {
                     }}
                     style={{ marginTop: "2vh" }}
                 >
-          Retour
+                    Retour
                 </Button>
 
-                <Center>
-                    <h1 className="Session-Cards-Title">{props.session.label}</h1>
-                </Center>
-                <Container className="Session-Details-Container">
-                    <Center>
-                        <p className="Session-Details-Description">
-                            <strong>Date de fin : </strong>
-                            {props.session.expiresAt.toLocaleString()}
-                        </p>
-                    </Center>
-                    <Center>
-                        <h2>Choix : </h2>
-                    </Center>
-                    <Chip.Group position="center" multiple={false} value={value} onChange={setValue}>
-                        {orderSessionChoicesByIdAsc(choices).map((choice) => (
-                            <>
-                                <Chip key={choice.id.toString()} value={choice.id.toString()}>{choice.label}</Chip>
-                            </>
-                        ))}
-                    </Chip.Group>
-                    <Button className="Vote-Button" onClick={sendVote}>Voter</Button>
-                </Container>
+                {!session && !sessionLoadError && (
+                    <>
+                        <Center>
+                            <h3 className="Session-Title">Chargement...</h3>
+                        </Center>
+                        <LoadingOverlay
+                            loaderProps={{ size: "lg", color: "pink", variant: "dots" }}
+                            overlayOpacity={0.3}
+                            overlayColor="#c5c5c5"
+                            visible
+                        />
+                    </>
+                )}
+                {sessionLoadError && (
+                    <>
+                        <Center>
+                            <h3 className="Session-Title">Erreur lors du chargement de la session</h3>
+                        </Center>
+                    </>
+                )}
+                {session && (
+                    <>
+                        <Center>
+                            <h1 className="Session-Cards-Title">{session.label}</h1>
+                        </Center>
+                        <Container className="Session-Details-Container">
+                            <Center>
+                                <p className="Session-Details-Description">
+                                    <em>
+                                        Votez en classant les choix dans l'ordre de vos préférences en cliquant sur les
+                                        boutons correspondants. (Vous ne pouvez pas voter pour un choix plus d'une fois)
+                                    </em>
+                                </p>
+                            </Center>
+                            <Center>
+                                <p className="Session-Details-Description">
+                                    <strong>Date de fin : </strong>
+                                    {dayjs(session.expiresAt).format("LLLL")}
+                                </p>
+                            </Center>
+                            <Center>
+                                <h2>Choix : </h2>
+                            </Center>
+                            {orderSessionChoicesByIdAsc(session.choices).map((choice, preferenceIndex) => (
+                                <>
+                                    <Center>
+                                        <Label>
+                                            Préférence {preferenceIndex + 1} :
+                                        </Label>
+                                        <Chip.Group
+                                            className={"Session-Choices-Preferences"}
+                                            key={preferenceIndex}
+                                            position="center" multiple={false}
+                                            value={session?.hasVoted ? session.vote.choiceIds[preferenceIndex].toString() : String(preferences[preferenceIndex])}
+                                            onChange={(event) => updatePreferences(preferenceIndex, event)}>
+                                            {orderSessionChoicesByIdAsc(session.choices).map((choice, index) => (
+                                                <>
+                                                    <Chip
+                                                        key={choice.id}
+                                                        value={choice.id.toString()}
+                                                        disabled={session.hasVoted && session.vote.choiceIds[preferenceIndex] != index}
+                                                    >
+                                                        {choice.label}
+                                                    </Chip>
+                                                </>
+                                            ))}
+                                        </Chip.Group>
+                                    </Center>
+                                </>
+                            ))}
+                            <Button
+                                className="Vote-Button"
+                                onClick={sendVote}
+                                disabled={session?.hasVoted}
+                            >
+                                <Center>
+                                    {session.hasVoted && (<> <em>Vous avez déjà voté pour cette session</em> </>)}
+                                    {!session.hasVoted && (<> <em>Envoyer mon vote</em> </>)}
+                                </Center>
+                            </Button>
+                        </Container>
+                    </>
+                )}
             </Container>
         </>
     );
