@@ -3,6 +3,7 @@ import { Card, CardSection, Center, Text } from "@mantine/core";
 import { Session } from "../../../models/sessions/session.model";
 import { useNavigate } from "react-router-dom";
 import { navigateTo } from "../../../utils/redirect.util";
+import dayjs from "dayjs";
 
 function SessionCard(props: { session: Session }) {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ function SessionCard(props: { session: Session }) {
                 </Text>
 
                 <Text mt="xs" color="dimmed" size="sm">
-                    <p>Fermeture : {props.session.expiresAt.toDateString()}</p>
+                    <p>Fermeture : {dayjs(props.session.expiresAt).format("LLLL")}</p>
                 </Text>
             </Card>
         </>

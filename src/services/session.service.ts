@@ -4,15 +4,15 @@ import { CreateSession } from "../models/sessions/create-session.dto";
 import { SessionAdapter } from "../adapters/session.adapter";
 
 export class SessionService {
-    private static contract: Contract;
 
     static async getOpenedSessions(contract: Contract): Promise<Session[]> {
-        const openedSessions = await contract.getOpenedSessionsForOwner();
+        const openedSessions = await contract.getOpenedSessionsForSender();
         return openedSessions.map(SessionAdapter.contractToDomain);
     }
 
     static async getClosedSessions(contract: Contract): Promise<Session[]> {
-        const closedSessions = await contract.getOwnerHistory();
+        const closedSessions = await contract.getClosedSessionsWhereSenderHasVoted();
+        console.log("history retrieved from contract", closedSessions);
         return closedSessions.map(SessionAdapter.contractToDomain);
     }
 
@@ -22,7 +22,7 @@ export class SessionService {
     }
 
     static async findSessionById(contract: Contract, sessionId: number): Promise<Session> {
-        const session = await contract.getSessionForOwner(sessionId);
+        const session = await contract.getSessionForSender(sessionId);
         return SessionAdapter.findByIdContractSessionToDomain(session);
     }
 

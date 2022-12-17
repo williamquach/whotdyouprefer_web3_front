@@ -32,6 +32,11 @@ function SessionHistory() {
                 <Center>
                     <h1 className="Session-Cards-Title">Historique de vote</h1>
                 </Center>
+                {/*
+                    TODO -> faire des onglets :
+                    - "Terminés" : affiche les votes terminés sur lesquels l'utilisateur a voté
+                    - "Créés" : affiche les votes créés par l'utilisateur
+                */}
                 {closedSessions.length === 0 && (
                     <NoSessions />
                 )}

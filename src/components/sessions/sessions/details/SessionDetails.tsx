@@ -25,6 +25,7 @@ function SessionDetails(props: { sessionId: number }) {
     const [preferenceCount, setPreferenceCount] = useState<number>(0);
     const [preferences, setPreferences] = useState<(number | undefined)[]>([]);
     const [voteIsBeingSent, setVoteIsBeingSent] = useState<boolean>(false);
+    const [voteCreationError, setVoteCreationError] = useState<boolean>();
 
     const findSessionById = async () => {
         if (wallet) {
@@ -62,11 +63,12 @@ function SessionDetails(props: { sessionId: number }) {
 
     useEffect(() => {
         findSessionById()
-            .then(() => console.log("Session loaded"))
+            .then(() => console.log("Session loaded : ", session))
             .catch((error) => console.error("Error while loading session details", error));
     }, [wallet]);
 
     const sendVote = async () => {
+        setVoteCreationError(false);
         if (!session) {
             alert("Session not set ???? Why you vote ? What are you doing ????");
             return;
@@ -95,30 +97,48 @@ function SessionDetails(props: { sessionId: number }) {
 
         const formattedPreferences = preferences.map((preference) => {
             if (preference == undefined) {
+                setVoteIsBeingSent(false);
                 throw new Error("A preference is undefined bro");
             }
             return preference;
         });
-        setVoteIsBeingSent(true);
-        const { contract } = await SmartContractService.load(wallet);
-        await SessionService.vote(contract, session.sessionId, formattedPreferences.map((preference) => preference));
-        setVoteIsBeingSent(false);
-
-        SmartContractService.listenToEvent(contract, "NewVote", (voteId, sessionId, choiceIds) => {
-            showNotification({
-                title: "Vote envoyé",
-                message: `Votre vote a bien été envoyé pour la session : '${session.label}'`,
-                color: "green",
-                icon: <IconCheck size={20} />,
-                autoClose: 2500,
-                onClose: () => {
-                    navigateTo("/", navigate);
+        try {
+            setVoteIsBeingSent(true);
+            const { contract } = await SmartContractService.load(wallet);
+            await SessionService.vote(contract, session.sessionId, formattedPreferences.map((preference) => preference));
+            SmartContractService.listenToEvent(contract, "NewVote", (voteId, sessionId, choiceIds) => {
+                if (choiceIds.length > 0) {
+                    showNotification({
+                        title: "Vote envoyé",
+                        message: `Votre vote a bien été envoyé pour la session : '${session.label}'`,
+                        color: "green",
+                        icon: <IconCheck size={20} />,
+                        autoClose: 2500,
+                        onClose: () => {
+                            setVoteIsBeingSent(false);
+                            navigateTo("/", navigate);
+                        }
+                    });
                 }
             });
-            navigateTo("/", navigate);
-        });
-
+        } catch (error) {
+            setVoteIsBeingSent(false);
+            setVoteCreationError(true);
+            showNotification({
+                title: "Erreur",
+                message: "Impossible d'envoyer votre vote",
+                color: "red",
+                icon: <IconX size={24} />
+            });
+        }
     };
+
+    function shouldDisableChoice(preferenceIndex: number, index: number) {
+        if (session) {
+            return session.hasVoted && session.vote.choiceIds[preferenceIndex] != index;
+        }
+        throw new Error("Session is not set");
+    }
 
     return (
         <>
@@ -169,6 +189,13 @@ function SessionDetails(props: { sessionId: number }) {
                         <Center>
                             <h1 className="Session-Cards-Title">{session.label}</h1>
                         </Center>
+                        {voteCreationError && (
+                            <>
+                                <Center>
+                                    <h3 className="Session-Title">Erreur lors de la soumission de votre vote</h3>
+                                </Center>
+                            </>
+                        )}
                         <Container className="Session-Details-Container">
                             <Center>
                                 <p className="Session-Details-Description">
@@ -204,7 +231,7 @@ function SessionDetails(props: { sessionId: number }) {
                                                     <Chip
                                                         key={choice.id}
                                                         value={choice.id.toString()}
-                                                        disabled={session.hasVoted && session.vote.choiceIds[preferenceIndex] != index}
+                                                        disabled={shouldDisableChoice(preferenceIndex, index)}
                                                     >
                                                         {choice.label}
                                                     </Chip>
@@ -221,7 +248,7 @@ function SessionDetails(props: { sessionId: number }) {
                             >
                                 <Center>
                                     {session.hasVoted && (<> <em>Vous avez déjà voté pour cette session</em> </>)}
-                                    {!session.hasVoted && (<> <em>Envoyer mon vote</em> </>)}
+                                    {!session.hasVoted && (<> <p>Envoyer mon vote</p> </>)}
                                 </Center>
                             </Button>
                         </Container>

@@ -4,17 +4,15 @@ import "./SessionClosedHome.css";
 import { AppHeader } from "../../../Home/header/AppHeader";
 import { headerLinks } from "../../../Home/Home";
 import { useParams } from "react-router-dom";
-import { findClosedSessionById } from "./session.service";
 import SessionClosedDetails from "./SessionClosedDetails";
 
 function SessionClosedHome() {
-    const sessionId = useParams().sessionId ?? "0";
-    const session = findClosedSessionById(parseInt(sessionId));
+    const sessionId = (useParams().sessionId ?? -1) as number;
     return (
         <>
             <AppHeader links={headerLinks} />
             <Container className="Main-Page-Container" size="lg">
-                <SessionClosedDetails session={session} />
+                <SessionClosedDetails sessionId={sessionId} />
             </Container>
         </>
     );

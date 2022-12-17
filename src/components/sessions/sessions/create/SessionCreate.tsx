@@ -24,6 +24,7 @@ function SessionCreate() {
     const navigate = useNavigate();
 
     const createSession = async () => {
+        setSessionCreationError(false);
         if (wallet) {
             const { contract } = await SmartContractService.load(wallet);
             setSessionIsBeingCreated(true);
@@ -34,19 +35,20 @@ function SessionCreate() {
                     expiresAt: dayjs(sessionEndDate).hour(dayjs(sessionEndTime).hour()).minute(dayjs(sessionEndTime).minute()).toDate(),
                     choices: sessionChoices
                 });
-                setSessionIsBeingCreated(false);
                 SmartContractService.listenToEvent(contract, "NewSession", (sessionId, label, description, endDateTime, choices) => {
-                    showNotification({
-                        title: "Session créée",
-                        message: "La session devrait être disponible à l'accueil ☺️",
-                        color: "green",
-                        /*    icon={<IconCheck size={20} />}*/
-                        icon: <IconCheck size={20} />,
-                        autoClose: 2500,
-                        onClose() {
-                            navigateTo("/", navigate);
-                        }
-                    });
+                    if (endDateTime > 0) {
+                        showNotification({
+                            title: "Session créée",
+                            message: "La session devrait être disponible à l'accueil ☺️",
+                            color: "green",
+                            icon: <IconCheck size={20} />,
+                            autoClose: 2500,
+                            onClose: () => {
+                                setSessionIsBeingCreated(false);
+                                navigateTo("/", navigate);
+                            }
+                        });
+                    }
                 });
             } catch (e) {
                 setSessionIsBeingCreated(false);
@@ -71,6 +73,9 @@ function SessionCreate() {
                         />
                     </>
                 )}
+                <Center>
+                    <h1 className="Session-Cards-Title">Création d'une session de vote</h1>
+                </Center>
                 {sessionCreationError && (
                     <>
                         <Center>
@@ -78,9 +83,6 @@ function SessionCreate() {
                         </Center>
                     </>
                 )}
-                <Center>
-                    <h1 className="Session-Cards-Title">Création d'une session de vote</h1>
-                </Center>
                 <Grid className="Session-Create-Fields Session-Form" gutter="lg">
                     <Col sm={6} md={6} lg={6}>
                         {/*  Session creation fields : string label, string description, Date endDateTime */}
@@ -112,7 +114,7 @@ function SessionCreate() {
                             withAsterisk
                             value={sessionEndDate}
                             onChange={setSessionEndDate}
-                            minDate={dayjs(new Date()).add(1, "day").toDate()}
+                            minDate={dayjs(new Date()).add(1, "hour").toDate()}
                         />
                         <TimeInput
                             className={"Session-Form-Field"}

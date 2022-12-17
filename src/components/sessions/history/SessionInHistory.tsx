@@ -2,11 +2,12 @@ import React from "react";
 import { Card, CardSection, Center, Text } from "@mantine/core";
 import "./SessionHistory.css";
 import { Session } from "../../../models/sessions/session.model";
+import { navigateTo } from "../../../utils/redirect.util";
+import { useNavigate } from "react-router-dom";
 
 function SessionInHistory(props: { session: Session }) {
-    const goToSessionClosedDetails = (session: Session) => {
-        console.log("goToSessionClosedDetails : " + session);
-    };
+    const navigate = useNavigate();
+
     return (
         <>
             <Card
@@ -14,9 +15,9 @@ function SessionInHistory(props: { session: Session }) {
                 p="xl"
                 component="a"
                 onClick={() => {
-                    goToSessionClosedDetails(props.session);
+                    navigateTo("/sessions/closed/" + props.session.sessionId, navigate);
                 }}
-                href={"/sessions/closed/" + props.session.sessionId}
+                href={"#"}
             >
                 <CardSection>
                     <Center className="Session-Name">

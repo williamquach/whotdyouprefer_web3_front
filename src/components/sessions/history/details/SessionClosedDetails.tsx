@@ -1,18 +1,73 @@
-import React from "react";
-import { Button, Center, Chip, Container } from "@mantine/core";
+import React, { useEffect, useState } from "react";
+import { Button, Center, Chip, Container, LoadingOverlay, Menu } from "@mantine/core";
 import "./SessionClosed.css";
 import { useNavigate } from "react-router-dom";
-import { SessionClosed } from "../../../../models/sessions/session-closed.model";
-import { orderSessionClosedChoicesByRankAsc } from "../../../../models/sessions/session-closed-choice.model";
 import { navigateTo } from "../../../../utils/redirect.util";
+import dayjs from "dayjs";
+import { Session } from "../../../../models/sessions/session.model";
+import { SmartContractService } from "../../../../smart-contracts/smart-contract-service";
+import { SessionService } from "../../../../services/session.service";
+import { showNotification } from "@mantine/notifications";
+import { IconX } from "@tabler/icons";
+import { useConnectWallet } from "@web3-onboard/react";
+import { orderSessionChoicesByIdAsc } from "../../../../models/sessions/session-choice.model";
+import Label = Menu.Label;
 
-function SessionClosedDetails(props: { session: SessionClosed }) {
-    const userVoteChoiceId = props.session.userChoiceId;
-
+function SessionClosedDetails(props: { sessionId: number }) {
     const navigate = useNavigate();
     const goBack = () => {
         navigateTo("/history", navigate);
     };
+
+    const [{ wallet }] = useConnectWallet();
+    const [sessionLoadError, setSessionLoadError] = useState<boolean>();
+    const [closedSession, setClosedSession] = useState<Session | undefined>();
+    const [preferenceCount, setPreferenceCount] = useState<number>(0);
+    const [preferences, setPreferences] = useState<(number | undefined)[]>([]);
+
+    const findClosedSessionById = async () => {
+        if (wallet) {
+            const { contract } = await SmartContractService.load(wallet);
+            try {
+                const foundClosedSession = await SessionService.findSessionById(contract, props.sessionId);
+                setClosedSession(foundClosedSession);
+                setPreferenceCount(foundClosedSession.choices.length);
+                setPreferences(Array.from(Array(preferenceCount).map(() => undefined)));
+            } catch (error) {
+                setSessionLoadError(true);
+                showNotification({
+                    title: "Erreur",
+                    message: "Impossible de charger la closedSession de vote",
+                    color: "red",
+                    icon: <IconX size={24} />
+                });
+            }
+        }
+    };
+
+    useEffect(() => {
+        findClosedSessionById()
+            .then(() => console.log("Closed closedSession loaded : ", closedSession))
+            .catch((error) => console.error("Error while loading closed closedSession details", error));
+    }, [wallet]);
+
+    // const currentChoiceChipIsVotedByPreferenceIndex = (preferenceIndex: number): boolean => {
+    //     if (closedSession) {
+    //         console.log("Closed session", closedSession);
+    //         console.log("Current vote : ", closedSession.vote.choiceIds[preferenceIndex]);
+    //         const foundChoiceIdByPreferenceIndex = closedSession.choices.find(choice => closedSession.vote.choiceIds[preferenceIndex] === choice.id);
+    //         console.log("Current choice found : ", foundChoiceIdByPreferenceIndex);
+    //         return foundChoiceIdByPreferenceIndex !== undefined;
+    //     }
+    //     return true;
+    // };
+
+    function shouldDisableChoice(preferenceIndex: number, index: number) {
+        if (closedSession) {
+            return closedSession.hasVoted && closedSession.vote.choiceIds[preferenceIndex] != index;
+        }
+        throw new Error("Closed session is not set");
+    }
 
     return (
         <>
@@ -28,29 +83,74 @@ function SessionClosedDetails(props: { session: SessionClosed }) {
                     Retour
                 </Button>
 
-                <Center>
-                    <h1 className="Session-Cards-Title">{props.session.label}</h1>
-                </Center>
-                <Container className="Session-Details-Container">
-                    <Center>
-                        <p className="Session-Details-Description">
-                            <strong>Fermeture : </strong>
-                            {props.session.expiresAt.toLocaleString()}
-                        </p>
-                    </Center>
-                    <Center>
-                        <h2>Choix : </h2>
-                    </Center>
-                    <Chip.Group position="center" multiple={false} value={userVoteChoiceId.toString()}>
-                        {orderSessionClosedChoicesByRankAsc(props.session.choices).map((choice) => (
-                            <>
-                                <Chip key={choice.id.toString()} value={choice.id.toString()}>
-                                    {choice.label} (Nombre de votes : {choice.votesCount})
-                                </Chip>
-                            </>
-                        ))}
-                    </Chip.Group>
-                </Container>
+                {!closedSession && !sessionLoadError && (
+                    <>
+                        <Center>
+                            <h3 className="Session-Title">Chargement...</h3>
+                        </Center>
+                        <LoadingOverlay
+                            loaderProps={{ size: "lg", color: "pink", variant: "dots" }}
+                            overlayOpacity={0.3}
+                            overlayColor="#c5c5c5"
+                            visible
+                        />
+                    </>
+                )}
+
+                {sessionLoadError && (
+                    <>
+                        <Center>
+                            <h3 className="Session-Title">Erreur lors du chargement de la session</h3>
+                        </Center>
+                    </>
+                )}
+
+                {closedSession && (
+                    <>
+
+                        <Center>
+                            <h1 className="Session-Cards-Title">{closedSession.label}</h1>
+                        </Center>
+                        <Container className="Session-Details-Container">
+                            <Center>
+                                <p className="Session-Details-Description">
+                                    <strong>Fermeture : </strong>
+                                    {dayjs(closedSession.expiresAt).format("LLLL")}
+                                </p>
+                            </Center>
+                            <Center>
+                                <h2>Choix : </h2>
+                            </Center>
+                            {orderSessionChoicesByIdAsc(closedSession.choices).map((choice, preferenceIndex) => (
+                                <>
+                                    <Center>
+                                        <Label>
+                                            Préférence {preferenceIndex + 1} :
+                                        </Label>
+                                        <Chip.Group
+                                            className={"Session-Choices-Preferences"}
+                                            key={preferenceIndex}
+                                            position="center" multiple={false}
+                                            value={closedSession?.hasVoted ? closedSession.vote.choiceIds[preferenceIndex].toString() : String(preferences[preferenceIndex])}
+                                        >
+                                            {orderSessionChoicesByIdAsc(closedSession.choices).map((choice, index) => (
+                                                <>
+                                                    <Chip
+                                                        key={choice.id}
+                                                        value={choice.id.toString()}
+                                                        disabled={shouldDisableChoice(preferenceIndex, index)}
+                                                    >
+                                                        {choice.label}
+                                                    </Chip>
+                                                </>
+                                            ))}
+                                        </Chip.Group>
+                                    </Center>
+                                </>
+                            ))}
+                        </Container>
+                    </>
+                )}
             </Container>
         </>
     );
