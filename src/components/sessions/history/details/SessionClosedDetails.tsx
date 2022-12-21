@@ -55,7 +55,6 @@ function SessionClosedDetails(props: { sessionId: number }) {
         if (closedSession) {
             const choiceIdInUserVote = closedSession.vote.choiceIds[preferenceIndex];
             const found = closedSession.choices.find((choice) => choice.id.toString() === choiceIdInUserVote.toString());
-            console.log("found", found);
             if (found) {
                 return closedSession.hasVoted && index != closedSession.choices.indexOf(found);
             }

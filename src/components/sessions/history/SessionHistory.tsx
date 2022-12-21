@@ -1,28 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Center, Col, Container, Grid } from "@mantine/core";
-import SessionInHistory from "./SessionInHistory";
+import { Center, Col, Container, Grid, Tabs } from "@mantine/core";
+import SessionUserIsCreatorInHistory from "./SessionUserIsCreatorInHistory";
 import NoSessions from "../sessions/NoSessions";
 import "./SessionHistory.css";
 import { orderSessionsFromNewestToOldest, Session } from "../../../models/sessions/session.model";
 import { useConnectWallet } from "@web3-onboard/react";
 import { SmartContractService } from "../../../smart-contracts/smart-contract-service";
 import { SessionService } from "../../../services/session.service";
+import { IconCertificate, IconWriting } from "@tabler/icons";
+import SessionUserHasVotedOnInHistory from "./SessionUserHasVotedOnInHistory";
 
 function SessionHistory() {
     const [{ wallet }] = useConnectWallet();
-    const [closedSessions, setClosedSessions] = useState<Session[]>([]);
+    const [closedSessionsWhereUserHasVotedOn, setClosedSessionsWhereUserHasVotedOn] = useState<Session[]>([]);
+    const [closedSessionsWhereUserIsCreator, setClosedSessionsWhereUserIsCreator] = useState<Session[]>([]);
 
-    const getClosedSessions = async () => {
+    const getClosedSessionsWhereUserHasVotedOn = async () => {
         if (wallet) {
             const { contract } = await SmartContractService.load(wallet);
-            const foundClosedSessions = await SessionService.getClosedSessions(contract);
-            setClosedSessions(foundClosedSessions);
+            const closedSessionsWhereUserHasVotedOn = await SessionService.getClosedSessionsWhereSenderHasVoted(contract);
+            setClosedSessionsWhereUserHasVotedOn(closedSessionsWhereUserHasVotedOn);
+        }
+    };
+
+    const getClosedSessionsWhereUserIsCreator = async () => {
+        if (wallet) {
+            const { contract } = await SmartContractService.load(wallet);
+            const closedSessionsWhereUserIsCreator = await SessionService.getClosedSessionsWhereSenderIsCreator(contract);
+            setClosedSessionsWhereUserIsCreator(closedSessionsWhereUserIsCreator);
         }
     };
 
     useEffect(() => {
-        getClosedSessions()
-            .then(() => console.log("Closed sessions loaded"))
+        Promise.all([getClosedSessionsWhereUserHasVotedOn(), getClosedSessionsWhereUserIsCreator()])
+            .then(() => console.log("Closed sessions (where user has voted and user has created) loaded : ", closedSessionsWhereUserHasVotedOn, closedSessionsWhereUserIsCreator))
             .catch((error) => console.error("Error while loading closed sessions", error));
     }, [wallet]);
 
@@ -32,23 +43,46 @@ function SessionHistory() {
                 <Center>
                     <h1 className="Session-Cards-Title">Historique de vote</h1>
                 </Center>
-                {/*
-                    TODO -> faire des onglets :
-                    - "Terminés" : affiche les votes terminés sur lesquels l'utilisateur a voté
-                    - "Créés" : affiche les votes créés par l'utilisateur
-                */}
-                {closedSessions.length === 0 && (
-                    <NoSessions />
-                )}
-                {closedSessions.length > 0 && (
-                    <Grid className="Session-Cards" gutter="lg">
-                        {orderSessionsFromNewestToOldest(closedSessions).map((session) => (
-                            <Col md={6} lg={6} key={session.sessionId}>
-                                <SessionInHistory session={session} />
-                            </Col>
-                        ))}
-                    </Grid>
-                )}
+                <Tabs color="green" defaultValue="has-voted-on">
+                    <Tabs.List>
+                        <Tabs.Tab value="has-voted-on" icon={<IconCertificate size={20} />}>
+                            A voté
+                        </Tabs.Tab>
+                        <Tabs.Tab value="has-created-it" icon={<IconWriting size={20} />}>
+                            Créé(s) de ma main
+                        </Tabs.Tab>
+                    </Tabs.List>
+
+                    <Tabs.Panel value="has-voted-on" pt="xs">
+                        {closedSessionsWhereUserHasVotedOn.length === 0 && (
+                            <NoSessions />
+                        )}
+                        {closedSessionsWhereUserHasVotedOn.length > 0 && (
+                            <Grid className="Session-Cards" gutter="lg">
+                                {orderSessionsFromNewestToOldest(closedSessionsWhereUserHasVotedOn).map((session) => (
+                                    <Col md={6} lg={6} key={session.sessionId}>
+                                        <SessionUserHasVotedOnInHistory session={session} />
+                                    </Col>
+                                ))}
+                            </Grid>
+                        )}
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="has-created-it" pt="xs">
+                        {closedSessionsWhereUserIsCreator.length === 0 && (
+                            <NoSessions />
+                        )}
+                        {closedSessionsWhereUserIsCreator.length > 0 && (
+                            <Grid className="Session-Cards" gutter="lg">
+                                {orderSessionsFromNewestToOldest(closedSessionsWhereUserIsCreator).map((session) => (
+                                    <Col md={6} lg={6} key={session.sessionId}>
+                                        <SessionUserIsCreatorInHistory session={session} />
+                                    </Col>
+                                ))}
+                            </Grid>
+                        )}
+                    </Tabs.Panel>
+                </Tabs>
             </Container>
         </>
     );

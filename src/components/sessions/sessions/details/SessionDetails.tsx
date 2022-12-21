@@ -22,8 +22,8 @@ function SessionDetails(props: { sessionId: number }) {
     const [{ wallet }] = useConnectWallet();
     const [sessionLoadError, setSessionLoadError] = useState<boolean>();
     const [session, setSession] = useState<Session | undefined>();
-    const [preferenceCount, setPreferenceCount] = useState<number>(0);
-    const [preferences, setPreferences] = useState<(number | undefined)[]>([]);
+    const [preferenceCount, setPreferenceCount] = useState<number>(4);
+    const [preferences, setPreferences] = useState<(number | undefined)[]>(Array(4).fill(undefined));
     const [voteIsBeingSent, setVoteIsBeingSent] = useState<boolean>(false);
     const [voteCreationError, setVoteCreationError] = useState<boolean>();
 
@@ -106,7 +106,6 @@ function SessionDetails(props: { sessionId: number }) {
             setVoteIsBeingSent(true);
             const { contract } = await SmartContractService.load(wallet);
             await SessionService.vote(contract, session.sessionId, formattedPreferences.map((preference) => preference));
-            setVoteIsBeingSent(false);
             SmartContractService.listenToEvent(contract, "NewVote", (voteId, sessionId, choiceIds) => {
                 if (choiceIds.length > 0) {
                     showNotification({
@@ -116,6 +115,7 @@ function SessionDetails(props: { sessionId: number }) {
                         icon: <IconCheck size={20} />,
                         autoClose: 2500,
                         onOpen: () => {
+                            setVoteIsBeingSent(false);
                             navigateTo("/", navigate);
                         }
                     });
@@ -135,11 +135,18 @@ function SessionDetails(props: { sessionId: number }) {
 
     function shouldDisableChoice(preferenceIndex: number, index: number) {
         if (session) {
+            if (session.vote.choiceIds.length <= 0) {
+                return false;
+            }
+            if (!session.hasVoted) {
+                return false;
+            }
+
+            // Disable choice if the choice is not the one he already chose
             const choiceIdInUserVote = session.vote.choiceIds[preferenceIndex];
-            const found = session.choices.find((choice) => choice.id.toString() === choiceIdInUserVote.toString());
-            console.log("found", found);
-            if (found) {
-                return session.hasVoted && index != session.choices.indexOf(found);
+            const choiceChosenInUserPreferences = session.choices.find((choice) => choice.id.toString() === choiceIdInUserVote.toString());
+            if (choiceChosenInUserPreferences) {
+                return index != session.choices.indexOf(choiceChosenInUserPreferences);
             }
             return true;
         }

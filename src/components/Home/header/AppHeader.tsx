@@ -30,7 +30,8 @@ const useStyles = createStyles((theme) => ({
         display: "flex",
         // justifyContent: "space-between",
         alignItems: "center",
-        height: "100%"
+        height: "100%",
+        marginLeft: 0
     },
 
     links: {

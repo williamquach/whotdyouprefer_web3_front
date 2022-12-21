@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Center, Col, Container, Grid, LoadingOverlay, TextInput } from "@mantine/core";
 import "./SessionCreate.css";
 import { DatePicker, TimeInput } from "@mantine/dates";
@@ -19,9 +19,16 @@ function SessionCreate() {
     const [sessionChoices, setSessionChoices] = useState<Array<string>>(["", "", "", ""]);
     const [sessionIsBeingCreated, setSessionIsBeingCreated] = useState<boolean>(false);
     const [sessionCreationError, setSessionCreationError] = useState<boolean>();
+    const [nowDatePlus1Day, setNowDatePlus1Day] = useState<Date>(dayjs().toDate());
 
     const [{ wallet }] = useConnectWallet();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        setTimeout(() => {
+            setNowDatePlus1Day(dayjs().add(24, "hour").toDate());
+        }, 1000);
+    }, [nowDatePlus1Day]);
 
     const createSession = async () => {
         setSessionCreationError(false);
@@ -43,7 +50,7 @@ function SessionCreate() {
                             color: "green",
                             icon: <IconCheck size={20} />,
                             autoClose: 2500,
-                            onClose: () => {
+                            onOpen: () => {
                                 setSessionIsBeingCreated(false);
                                 navigateTo("/", navigate);
                             }
@@ -61,6 +68,7 @@ function SessionCreate() {
             }
         }
     };
+
     return (
         <>
             <Container>
@@ -120,7 +128,7 @@ function SessionCreate() {
                             withAsterisk
                             value={sessionEndDate}
                             onChange={setSessionEndDate}
-                            minDate={dayjs(new Date()).add(1, "hour").toDate()}
+                            minDate={nowDatePlus1Day}
                         />
                         <TimeInput
                             className={"Session-Form-Field"}

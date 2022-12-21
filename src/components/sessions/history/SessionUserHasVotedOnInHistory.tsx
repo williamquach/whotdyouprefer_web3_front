@@ -5,7 +5,7 @@ import { Session } from "../../../models/sessions/session.model";
 import { navigateTo } from "../../../utils/redirect.util";
 import { useNavigate } from "react-router-dom";
 
-function SessionInHistory(props: { session: Session }) {
+function SessionUserHasVotedOnInHistory(props: { session: Session }) {
     const navigate = useNavigate();
 
     return (
@@ -32,7 +32,7 @@ function SessionInHistory(props: { session: Session }) {
                 <Text mt="xs" color="dimmed" size="sm">
                     <p>Fermée : {props.session.expiresAt.toDateString()}</p>
                 </Text>
-                {/*  Display if user has already voted */}
+
                 {props.session.hasVoted && (
                     <>
                         <Divider my="sm" variant="solid" />
@@ -46,4 +46,4 @@ function SessionInHistory(props: { session: Session }) {
     );
 }
 
-export default SessionInHistory;
+export default SessionUserHasVotedOnInHistory;

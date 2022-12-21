@@ -11,9 +11,15 @@ export class SessionService {
         return openedSessions.map(SessionAdapter.contractToDomain);
     }
 
-    static async getClosedSessions(contract: Contract): Promise<Session[]> {
+    static async getClosedSessionsWhereSenderHasVoted(contract: Contract): Promise<Session[]> {
         const closedSessions = await contract.getClosedSessionsWhereSenderHasVoted();
-        console.log("history retrieved from contract", closedSessions);
+        console.log("Closed sessions where sender has voted", closedSessions);
+        return closedSessions.map(SessionAdapter.contractToDomain);
+    }
+
+    static async getClosedSessionsWhereSenderIsCreator(contract: Contract): Promise<Session[]> {
+        const closedSessions = await contract.getClosedSessionsWhereSenderIsCreator();
+        console.log("Closed sessions where sender is creator", closedSessions);
         return closedSessions.map(SessionAdapter.contractToDomain);
     }
 
