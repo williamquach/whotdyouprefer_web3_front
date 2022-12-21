@@ -7,7 +7,7 @@ import { SessionService } from "../../../../services/session.service";
 import { SmartContractService } from "../../../../smart-contracts/smart-contract-service";
 import { useConnectWallet } from "@web3-onboard/react";
 import { showNotification } from "@mantine/notifications";
-import { IconCheck } from "@tabler/icons";
+import { IconCheck, IconX } from "@tabler/icons";
 import { useNavigate } from "react-router-dom";
 import { navigateTo } from "../../../../utils/redirect.util";
 
@@ -59,12 +59,23 @@ function SessionCreate() {
                 });
             } catch (e: any) {
                 console.error(e);
+                setSessionIsBeingCreated(false);
                 if (e.code === "ACTION_REJECTED") {
-                    setSessionIsBeingCreated(false);
+                    showNotification({
+                        title: "Action refusée",
+                        message: "Vous avez refusé la transaction",
+                        color: "orange",
+                        icon: <IconX size={24} />
+                    });
                     return;
                 }
-                setSessionIsBeingCreated(false);
                 setSessionCreationError(true);
+                showNotification({
+                    title: "Erreur",
+                    message: "Une erreur est survenue lors de la création de la session 😢",
+                    color: "red",
+                    icon: <IconX size={24} />
+                });
             }
         }
     };

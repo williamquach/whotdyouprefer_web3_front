@@ -2,13 +2,13 @@ import React from "react";
 import { Container } from "@mantine/core";
 import "./SessionHistory.css";
 import { AppHeader } from "../../Home/header/AppHeader";
-import { headerLinks } from "../../Home/Home";
+import { headerLinks, personalLinks } from "../../Home/Home";
 import SessionHistory from "./SessionHistory";
 
 function SessionHistoryHome() {
     return (
         <>
-            <AppHeader links={headerLinks} />
+            <AppHeader links={headerLinks} otherLinks={personalLinks} />
             <Container className="Main-Page-Container" size="lg">
                 <SessionHistory />
             </Container>

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { Burger, Button, Center, Container, createStyles, Group, Header, Paper, Transition } from "@mantine/core";
+import { Burger, Button, Center, Container, createStyles, Group, Header, Menu, Paper, Transition } from "@mantine/core";
 import { HeaderProps } from "./header-props";
 import logo from "../../../logo.svg";
 import "./AppHeader.css";
 import { useNavigate } from "react-router-dom";
 import { navigateTo } from "../../../utils/redirect.util";
+import { IconUserCircle } from "@tabler/icons";
 
 const HEADER_HEIGHT = 60;
 
@@ -68,6 +69,27 @@ const useStyles = createStyles((theme) => ({
         }
     },
 
+    otherLinks: {
+        display: "block !important",
+        lineHeight: 1,
+        padding: "8px 12px !important",
+        borderRadius: theme.radius.sm,
+        textDecoration: "none",
+        textAlign: "center",
+        color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.colors.gray[7],
+        fontSize: theme.fontSizes.sm,
+        fontWeight: 500,
+
+        "&:hover": {
+            backgroundColor: "transparent"
+        },
+
+        [theme.fn.smallerThan("sm")]: {
+            borderRadius: 0,
+            padding: theme.spacing.md
+        }
+    },
+
     linkActive: {
         "&, &:hover": {
             backgroundColor: theme.fn.variant({ variant: "light", color: theme.primaryColor }).background,
@@ -77,8 +99,9 @@ const useStyles = createStyles((theme) => ({
 }));
 
 
-export function AppHeader({ links }: HeaderProps) {
-    const [opened, { toggle }] = useDisclosure(false);
+export function AppHeader({ links, otherLinks }: HeaderProps) {
+    const [noPlaceBurgerOpened, { toggle }] = useDisclosure(false);
+    const [menuOtherLinksOpened, { toggle: toggleMenuOtherLinks }] = useDisclosure(false);
     const foundCurrentLink = links.find((link) => link.link === window.location.pathname);
     const [active, setActive] = useState(foundCurrentLink?.link);
     const navigate = useNavigate();
@@ -88,6 +111,26 @@ export function AppHeader({ links }: HeaderProps) {
         <Button
             key={link.label}
             className={cx(classes.link, { [classes.linkActive]: active === link.link })}
+            onClick={(event) => {
+                event.preventDefault();
+                navigateTo(link.link, navigate);
+                setActive(link.link);
+            }}
+            variant={active === link.link ? "light" : "subtle"}
+            style={active === link.link ? {
+                color: "black",
+                fontWeight: "bold",
+                backgroundColor: "rgba(255,255,255,0.7)"
+            } : {}}
+        >
+            {link.label}
+        </Button>
+    ));
+
+    const otherItems = otherLinks.map((link) => (
+        <Button
+            key={link.label}
+            className={cx(classes.otherLinks, { [classes.linkActive]: active === link.link })}
             onClick={(event) => {
                 event.preventDefault();
                 navigateTo(link.link, navigate);
@@ -119,10 +162,29 @@ export function AppHeader({ links }: HeaderProps) {
                     {items}
                 </Group>
 
+                <Burger opened={noPlaceBurgerOpened} onClick={toggle} className={classes.burger} size="sm" />
+                <Menu opened={menuOtherLinksOpened} trigger="hover" openDelay={10} closeDelay={400}>
+                    <Menu.Target>
+                        <Button variant="light" style={{ backgroundColor: "transparent", color: "black" }} uppercase
+                            onClick={toggleMenuOtherLinks}>
+                            <IconUserCircle size="30" />
+                        </Button>
+                    </Menu.Target>
 
-                <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
+                    <Menu.Dropdown>
+                        {otherItems.length > 0 && otherItems.map((item) => (
+                            <>
+                                <Menu.Item
+                                    // rightSection={<Text size="xs" color="dimmed">⌘K</Text>}
+                                >
+                                    {item}
+                                </Menu.Item>
+                            </>
+                        ))}
+                    </Menu.Dropdown>
+                </Menu>
 
-                <Transition transition="pop-top-right" duration={200} mounted={opened}>
+                <Transition transition="pop-top-right" duration={200} mounted={noPlaceBurgerOpened}>
                     {(styles) => (
                         <Paper className={classes.dropdown} withBorder style={styles}>
                             {items}

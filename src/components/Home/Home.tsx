@@ -7,15 +7,20 @@ import { AppHeader } from "./header/AppHeader";
 export const headerLinks = [
     { label: "🏠 Accueil", link: "/" },
     { label: "➕ Créer une session de vote", link: "/sessions/create" },
-    { label: "📖 Historique", link: "/history" },
-    { label: "🫵 Compte", link: "/account" }
+    { label: "📖 Historique", link: "/history" }
 ];
+
+export const personalLinks = [
+    { label: "🫵 Compte", link: "/account" },
+    { label: "💸 Dons", link: "/donation" }
+];
+
 
 export function Home() {
 
     return (
         <>
-            <AppHeader links={headerLinks} />
+            <AppHeader links={headerLinks} otherLinks={personalLinks} />
             <Container className="Main-Page-Container" size="lg">
                 <Sessions />
             </Container>

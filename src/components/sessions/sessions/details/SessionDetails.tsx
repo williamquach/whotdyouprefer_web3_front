@@ -121,12 +121,22 @@ function SessionDetails(props: { sessionId: number }) {
                     });
                 }
             });
-        } catch (error) {
+        } catch (e: any) {
+            console.error(e);
             setVoteIsBeingSent(false);
+            if (e.code === "ACTION_REJECTED") {
+                showNotification({
+                    title: "Action refusée",
+                    message: "Vous avez refusé la transaction",
+                    color: "orange",
+                    icon: <IconX size={24} />
+                });
+                return;
+            }
             setVoteCreationError(true);
             showNotification({
                 title: "Erreur",
-                message: "Impossible d'envoyer votre vote",
+                message: "Une erreur est survenue lors de la soumission de votre vote 😢",
                 color: "red",
                 icon: <IconX size={24} />
             });
