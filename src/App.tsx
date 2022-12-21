@@ -11,32 +11,9 @@ import SessionHistoryHome from "./components/sessions/history/SessionHistoryHome
 import AccountHome from "./components/user/account/AccountHome";
 import SessionDetailsHome from "./components/sessions/sessions/details/SessionDetailsHome";
 import SessionClosedHome from "./components/sessions/history/details/SessionClosedHome";
-import injectedModule from "@web3-onboard/injected-wallets";
-import { init, useConnectWallet } from "@web3-onboard/react";
+import { useConnectWallet } from "@web3-onboard/react";
 import SessionCreateHome from "./components/sessions/sessions/create/SessionCreateHome";
-import LocalizedFormat from "dayjs/plugin/localizedFormat";
-import dayjs from "dayjs";
 import "dayjs/locale/fr";
-
-dayjs.locale("fr");
-dayjs.extend(LocalizedFormat);
-
-const injected = injectedModule();
-// const MAINNET_RPC_URL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
-// const MAINNET_RPC_URL = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`;
-const MAINNET_RPC_URL = `http://localhost:8545`;
-
-init({
-    wallets: [injected],
-    chains: [
-        {
-            id: "0x1",
-            token: "ETH",
-            label: "Ethereum Mainnet",
-            rpcUrl: MAINNET_RPC_URL
-        }
-    ]
-});
 
 function App() {
     const [{ wallet, connecting }] = useConnectWallet();

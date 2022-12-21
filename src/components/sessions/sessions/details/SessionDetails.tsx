@@ -31,9 +31,10 @@ function SessionDetails(props: { sessionId: number }) {
         if (wallet) {
             const { contract } = await SmartContractService.load(wallet);
             try {
-                const foundOpenedSessions = await SessionService.findSessionById(contract, props.sessionId);
-                setSession(foundOpenedSessions);
-                setPreferenceCount(foundOpenedSessions.choices.length);
+                const session = await SessionService.findSessionById(contract, props.sessionId);
+                console.log("Found opened session in session details", session);
+                setSession(session);
+                setPreferenceCount(session.choices.length);
                 setPreferences(Array.from(Array(preferenceCount).map(() => undefined)));
             } catch (error) {
                 setSessionLoadError(true);
@@ -63,7 +64,6 @@ function SessionDetails(props: { sessionId: number }) {
 
     useEffect(() => {
         findSessionById()
-            .then(() => console.log("Session loaded : ", session))
             .catch((error) => console.error("Error while loading session details", error));
     }, [wallet]);
 
@@ -106,6 +106,7 @@ function SessionDetails(props: { sessionId: number }) {
             setVoteIsBeingSent(true);
             const { contract } = await SmartContractService.load(wallet);
             await SessionService.vote(contract, session.sessionId, formattedPreferences.map((preference) => preference));
+            setVoteIsBeingSent(false);
             SmartContractService.listenToEvent(contract, "NewVote", (voteId, sessionId, choiceIds) => {
                 if (choiceIds.length > 0) {
                     showNotification({
@@ -114,8 +115,7 @@ function SessionDetails(props: { sessionId: number }) {
                         color: "green",
                         icon: <IconCheck size={20} />,
                         autoClose: 2500,
-                        onClose: () => {
-                            setVoteIsBeingSent(false);
+                        onOpen: () => {
                             navigateTo("/", navigate);
                         }
                     });
@@ -135,7 +135,13 @@ function SessionDetails(props: { sessionId: number }) {
 
     function shouldDisableChoice(preferenceIndex: number, index: number) {
         if (session) {
-            return session.hasVoted && session.vote.choiceIds[preferenceIndex] != index;
+            const choiceIdInUserVote = session.vote.choiceIds[preferenceIndex];
+            const found = session.choices.find((choice) => choice.id.toString() === choiceIdInUserVote.toString());
+            console.log("found", found);
+            if (found) {
+                return session.hasVoted && index != session.choices.indexOf(found);
+            }
+            return true;
         }
         throw new Error("Session is not set");
     }

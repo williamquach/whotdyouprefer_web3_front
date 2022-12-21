@@ -51,20 +51,15 @@ function SessionClosedDetails(props: { sessionId: number }) {
             .catch((error) => console.error("Error while loading closed closedSession details", error));
     }, [wallet]);
 
-    // const currentChoiceChipIsVotedByPreferenceIndex = (preferenceIndex: number): boolean => {
-    //     if (closedSession) {
-    //         console.log("Closed session", closedSession);
-    //         console.log("Current vote : ", closedSession.vote.choiceIds[preferenceIndex]);
-    //         const foundChoiceIdByPreferenceIndex = closedSession.choices.find(choice => closedSession.vote.choiceIds[preferenceIndex] === choice.id);
-    //         console.log("Current choice found : ", foundChoiceIdByPreferenceIndex);
-    //         return foundChoiceIdByPreferenceIndex !== undefined;
-    //     }
-    //     return true;
-    // };
-
     function shouldDisableChoice(preferenceIndex: number, index: number) {
         if (closedSession) {
-            return closedSession.hasVoted && closedSession.vote.choiceIds[preferenceIndex] != index;
+            const choiceIdInUserVote = closedSession.vote.choiceIds[preferenceIndex];
+            const found = closedSession.choices.find((choice) => choice.id.toString() === choiceIdInUserVote.toString());
+            console.log("found", found);
+            if (found) {
+                return closedSession.hasVoted && index != closedSession.choices.indexOf(found);
+            }
+            return true;
         }
         throw new Error("Closed session is not set");
     }

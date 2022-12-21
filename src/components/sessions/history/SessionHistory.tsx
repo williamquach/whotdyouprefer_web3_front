@@ -43,7 +43,7 @@ function SessionHistory() {
                 {closedSessions.length > 0 && (
                     <Grid className="Session-Cards" gutter="lg">
                         {orderSessionsFromNewestToOldest(closedSessions).map((session) => (
-                            <Col md={6} lg={6}>
+                            <Col md={6} lg={6} key={session.sessionId}>
                                 <SessionInHistory session={session} />
                             </Col>
                         ))}

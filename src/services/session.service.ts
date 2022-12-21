@@ -7,6 +7,7 @@ export class SessionService {
 
     static async getOpenedSessions(contract: Contract): Promise<Session[]> {
         const openedSessions = await contract.getOpenedSessionsForSender();
+        console.log("Opened sessions", openedSessions);
         return openedSessions.map(SessionAdapter.contractToDomain);
     }
 

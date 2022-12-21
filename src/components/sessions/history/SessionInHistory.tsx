@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardSection, Center, Text } from "@mantine/core";
+import { Card, CardSection, Center, Divider, Text } from "@mantine/core";
 import "./SessionHistory.css";
 import { Session } from "../../../models/sessions/session.model";
 import { navigateTo } from "../../../utils/redirect.util";
@@ -32,6 +32,15 @@ function SessionInHistory(props: { session: Session }) {
                 <Text mt="xs" color="dimmed" size="sm">
                     <p>Fermée : {props.session.expiresAt.toDateString()}</p>
                 </Text>
+                {/*  Display if user has already voted */}
+                {props.session.hasVoted && (
+                    <>
+                        <Divider my="sm" variant="solid" />
+                        <Text mt="xs" color="dimmed" size="sm">
+                            <strong><em>Vous avez participé à cette session ✅</em></strong>
+                        </Text>
+                    </>
+                )}
             </Card>
         </>
     );

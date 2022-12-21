@@ -35,7 +35,7 @@ function SessionCreate() {
                     expiresAt: dayjs(sessionEndDate).hour(dayjs(sessionEndTime).hour()).minute(dayjs(sessionEndTime).minute()).toDate(),
                     choices: sessionChoices
                 });
-                SmartContractService.listenToEvent(contract, "NewSession", (sessionId, label, description, endDateTime, choices) => {
+                SmartContractService.listenToEvent(contract, "NewSession", (sessionId, label, description, endDateTime) => {
                     if (endDateTime > 0) {
                         showNotification({
                             title: "Session créée",
@@ -50,10 +50,14 @@ function SessionCreate() {
                         });
                     }
                 });
-            } catch (e) {
+            } catch (e: any) {
+                console.error(e);
+                if (e.code === "ACTION_REJECTED") {
+                    setSessionIsBeingCreated(false);
+                    return;
+                }
                 setSessionIsBeingCreated(false);
                 setSessionCreationError(true);
-                console.error(e);
             }
         }
     };
@@ -62,15 +66,17 @@ function SessionCreate() {
             <Container>
                 {sessionIsBeingCreated && (
                     <>
-                        <Center>
-                            <h3 className="Session-Title">Création de la session en cours...</h3>
-                        </Center>
                         <LoadingOverlay
                             loaderProps={{ size: "lg", color: "pink", variant: "dots" }}
                             overlayOpacity={0.3}
                             overlayColor="#c5c5c5"
                             visible
-                        />
+                        >
+
+                            <Center>
+                                <h3 className="Session-Title">Création de la session en cours...</h3>
+                            </Center>
+                        </LoadingOverlay>
                     </>
                 )}
                 <Center>

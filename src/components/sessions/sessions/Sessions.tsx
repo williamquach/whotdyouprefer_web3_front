@@ -16,6 +16,7 @@ function Sessions() {
         if (wallet) {
             const { contract } = await SmartContractService.load(wallet);
             const foundOpenedSessions = await SessionService.getOpenedSessions(contract);
+            console.log("Found opened session in home", foundOpenedSessions);
             setSessions(foundOpenedSessions);
         }
     };
@@ -54,7 +55,7 @@ function Sessions() {
                     <Grid className="Session-Cards" gutter="lg">
                         {orderSessionsFromNewestToOldest(sessions).map((session) => (
                             <Col md={6} lg={6} key={session.sessionId}>
-                                <SessionCard session={session} />
+                                <SessionCard session={session} userHasVoted={session.hasVoted} />
                             </Col>
                         ))}
                     </Grid>

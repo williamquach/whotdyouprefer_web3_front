@@ -10,7 +10,9 @@ export class SessionAdapter {
             contractSession.session.sessionId,
             contractSession.session.label,
             new Date(parseInt(contractSession.session.endDateTime._hex, 16) * 1000),
-            contractSession.session.description
+            contractSession.session.description,
+            [],
+            contractSession.hasVoted
         );
     }
 

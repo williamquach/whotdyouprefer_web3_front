@@ -5,10 +5,19 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { NotificationsProvider } from "@mantine/notifications";
+import dayjs from "dayjs";
+import LocalizedFormat from "dayjs/plugin/localizedFormat";
+import { SmartContractService } from "./smart-contracts/smart-contract-service";
+
+dayjs.locale("fr");
+dayjs.extend(LocalizedFormat);
+
+SmartContractService.initOnBoard();
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
 );
+
 root.render(
     <React.StrictMode>
         <BrowserRouter>
