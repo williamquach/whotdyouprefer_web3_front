@@ -27,9 +27,9 @@ function SessionClosedDetails(props: { sessionId: number }) {
 
     const findClosedSessionById = async () => {
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet);
+            const { voteContract } = SmartContractService.loadVoteContract(wallet);
             try {
-                const foundClosedSession = await SessionService.findSessionById(contract, props.sessionId);
+                const foundClosedSession = await SessionService.findSessionById(voteContract, props.sessionId);
                 setClosedSession(foundClosedSession);
                 setPreferenceCount(foundClosedSession.choices.length);
                 setPreferences(Array.from(Array(preferenceCount).map(() => undefined)));
@@ -47,7 +47,6 @@ function SessionClosedDetails(props: { sessionId: number }) {
 
     useEffect(() => {
         findClosedSessionById()
-            .then(() => console.log("Closed closedSession loaded : ", closedSession))
             .catch((error) => console.error("Error while loading closed closedSession details", error));
     }, [wallet]);
 

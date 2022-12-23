@@ -14,18 +14,14 @@ function Sessions() {
 
     const getSessions = async () => {
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet);
-            const foundOpenedSessions = await SessionService.getOpenedSessions(contract);
-            console.log("Found opened session in home", foundOpenedSessions);
+            const { voteContract } = SmartContractService.loadVoteContract(wallet);
+            const foundOpenedSessions = await SessionService.getOpenedSessions(voteContract);
             setSessions(foundOpenedSessions);
         }
     };
 
     useEffect(() => {
         getSessions()
-            .then(() => {
-                console.log("Opened sessions loaded");
-            })
             .catch((error) => console.error("Error while loading opened sessions", error));
     }, [wallet]);
 

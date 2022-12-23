@@ -17,23 +17,22 @@ function SessionHistory() {
 
     const getClosedSessionsWhereUserHasVotedOn = async () => {
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet);
-            const closedSessionsWhereUserHasVotedOn = await SessionService.getClosedSessionsWhereSenderHasVoted(contract);
+            const { voteContract } = SmartContractService.loadVoteContract(wallet);
+            const closedSessionsWhereUserHasVotedOn = await SessionService.getClosedSessionsWhereSenderHasVoted(voteContract);
             setClosedSessionsWhereUserHasVotedOn(closedSessionsWhereUserHasVotedOn);
         }
     };
 
     const getClosedSessionsWhereUserIsCreator = async () => {
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet);
-            const closedSessionsWhereUserIsCreator = await SessionService.getClosedSessionsWhereSenderIsCreator(contract);
+            const { voteContract } = SmartContractService.loadVoteContract(wallet);
+            const closedSessionsWhereUserIsCreator = await SessionService.getClosedSessionsWhereSenderIsCreator(voteContract);
             setClosedSessionsWhereUserIsCreator(closedSessionsWhereUserIsCreator);
         }
     };
 
     useEffect(() => {
         Promise.all([getClosedSessionsWhereUserHasVotedOn(), getClosedSessionsWhereUserIsCreator()])
-            .then(() => console.log("Closed sessions (where user has voted and user has created) loaded : ", closedSessionsWhereUserHasVotedOn, closedSessionsWhereUserIsCreator))
             .catch((error) => console.error("Error while loading closed sessions", error));
     }, [wallet]);
 

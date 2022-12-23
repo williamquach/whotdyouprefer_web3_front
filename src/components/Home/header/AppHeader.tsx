@@ -22,7 +22,7 @@ const useStyles = createStyles((theme) => ({
         borderTopWidth: 0,
         overflow: "hidden",
 
-        [theme.fn.largerThan("xs")]: {
+        [theme.fn.largerThan("sm")]: {
             display: "none"
         }
     },
@@ -36,13 +36,13 @@ const useStyles = createStyles((theme) => ({
     },
 
     links: {
-        [theme.fn.smallerThan("xs")]: {
+        [theme.fn.smallerThan("sm")]: {
             display: "none"
         }
     },
 
     burger: {
-        [theme.fn.largerThan("xs")]: {
+        [theme.fn.largerThan("sm")]: {
             display: "none"
         }
     },
@@ -57,7 +57,6 @@ const useStyles = createStyles((theme) => ({
         color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.colors.gray[7],
         fontSize: theme.fontSizes.sm,
         fontWeight: 500,
-
 
         "&:hover": {
             backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0]
@@ -81,7 +80,7 @@ const useStyles = createStyles((theme) => ({
         fontWeight: 500,
 
         "&:hover": {
-            backgroundColor: "transparent"
+            backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0]
         },
 
         [theme.fn.smallerThan("sm")]: {
@@ -162,24 +161,24 @@ export function AppHeader({ links, otherLinks }: HeaderProps) {
                     {items}
                 </Group>
 
-                <Burger opened={noPlaceBurgerOpened} onClick={toggle} className={classes.burger} size="sm" />
+                <Burger opened={noPlaceBurgerOpened} onClick={() => {
+                    toggle();
+                    menuOtherLinksOpened && toggleMenuOtherLinks();
+                }} className={classes.burger} size="sm" />
                 <Menu opened={menuOtherLinksOpened} trigger="hover" openDelay={10} closeDelay={400}>
                     <Menu.Target>
                         <Button variant="light" style={{ backgroundColor: "transparent", color: "black" }} uppercase
-                            onClick={toggleMenuOtherLinks}>
+                            onClick={() => {
+                                toggleMenuOtherLinks();
+                                noPlaceBurgerOpened && toggle();
+                            }}>
                             <IconUserCircle size="30" />
                         </Button>
                     </Menu.Target>
 
                     <Menu.Dropdown>
                         {otherItems.length > 0 && otherItems.map((item) => (
-                            <>
-                                <Menu.Item
-                                    // rightSection={<Text size="xs" color="dimmed">⌘K</Text>}
-                                >
-                                    {item}
-                                </Menu.Item>
-                            </>
+                            item
                         ))}
                     </Menu.Dropdown>
                 </Menu>

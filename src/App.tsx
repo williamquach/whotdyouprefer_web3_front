@@ -14,9 +14,12 @@ import SessionClosedHome from "./components/sessions/history/details/SessionClos
 import { useConnectWallet } from "@web3-onboard/react";
 import SessionCreateHome from "./components/sessions/sessions/create/SessionCreateHome";
 import "dayjs/locale/fr";
+import DonationHome from "./components/donation/DonationHome";
 
 function App() {
     const [{ wallet, connecting }] = useConnectWallet();
+
+    // Get element with id account-center-with-notify and unshow it 5 seconds after the page is loaded
     if (connecting) {
         return (
             <Container className="App">
@@ -31,6 +34,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/welcome" element={<Welcome />} />
                     <Route path="/account" element={<AccountHome />} />
+                    <Route path="/donation" element={<DonationHome />} />
                     <Route path="/history" element={<SessionHistoryHome />} />
                     <Route path="/sessions/create" element={<SessionCreateHome />} />
                     <Route path="/sessions/:sessionId" element={<SessionDetailsHome />} />

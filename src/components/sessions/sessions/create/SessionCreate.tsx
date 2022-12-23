@@ -33,16 +33,16 @@ function SessionCreate() {
     const createSession = async () => {
         setSessionCreationError(false);
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet);
+            const { voteContract } = SmartContractService.loadVoteContract(wallet);
             setSessionIsBeingCreated(true);
             try {
-                await SessionService.createSession(contract, {
+                await SessionService.createSession(voteContract, {
                     label: sessionName,
                     description: sessionDescription,
                     expiresAt: dayjs(sessionEndDate).hour(dayjs(sessionEndTime).hour()).minute(dayjs(sessionEndTime).minute()).toDate(),
                     choices: sessionChoices
                 });
-                SmartContractService.listenToEvent(contract, "NewSession", (sessionId, label, description, endDateTime) => {
+                SmartContractService.listenToEvent(voteContract, "NewSession", (sessionId, label, description, endDateTime) => {
                     if (endDateTime > 0) {
                         showNotification({
                             title: "Session créée",

@@ -29,10 +29,9 @@ function SessionDetails(props: { sessionId: number }) {
 
     const findSessionById = async () => {
         if (wallet) {
-            const { contract } = await SmartContractService.load(wallet);
+            const { voteContract } = SmartContractService.loadVoteContract(wallet);
             try {
-                const session = await SessionService.findSessionById(contract, props.sessionId);
-                console.log("Found opened session in session details", session);
+                const session = await SessionService.findSessionById(voteContract, props.sessionId);
                 setSession(session);
                 setPreferenceCount(session.choices.length);
                 setPreferences(Array.from(Array(preferenceCount).map(() => undefined)));
@@ -104,9 +103,9 @@ function SessionDetails(props: { sessionId: number }) {
         });
         try {
             setVoteIsBeingSent(true);
-            const { contract } = await SmartContractService.load(wallet);
-            await SessionService.vote(contract, session.sessionId, formattedPreferences.map((preference) => preference));
-            SmartContractService.listenToEvent(contract, "NewVote", (voteId, sessionId, choiceIds) => {
+            const { voteContract } = SmartContractService.loadVoteContract(wallet);
+            await SessionService.vote(voteContract, session.sessionId, formattedPreferences.map((preference) => preference));
+            SmartContractService.listenToEvent(voteContract, "NewVote", (voteId, sessionId, choiceIds) => {
                 if (choiceIds.length > 0) {
                     showNotification({
                         title: "Vote envoyé",

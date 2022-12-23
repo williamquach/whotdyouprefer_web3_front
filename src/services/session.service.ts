@@ -7,19 +7,16 @@ export class SessionService {
 
     static async getOpenedSessions(contract: Contract): Promise<Session[]> {
         const openedSessions = await contract.getOpenedSessionsForSender();
-        console.log("Opened sessions", openedSessions);
         return openedSessions.map(SessionAdapter.contractToDomain);
     }
 
     static async getClosedSessionsWhereSenderHasVoted(contract: Contract): Promise<Session[]> {
         const closedSessions = await contract.getClosedSessionsWhereSenderHasVoted();
-        console.log("Closed sessions where sender has voted", closedSessions);
         return closedSessions.map(SessionAdapter.contractToDomain);
     }
 
     static async getClosedSessionsWhereSenderIsCreator(contract: Contract): Promise<Session[]> {
         const closedSessions = await contract.getClosedSessionsWhereSenderIsCreator();
-        console.log("Closed sessions where sender is creator", closedSessions);
         return closedSessions.map(SessionAdapter.contractToDomain);
     }
 
