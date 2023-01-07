@@ -1,9 +1,17 @@
 import React from "react";
 import { Button, Center, Container } from "@mantine/core";
 import { useConnectWallet } from "@web3-onboard/react";
+import { WalletState } from "@web3-onboard/core";
+import { SmartContractService } from "../../../smart-contracts/smart-contract-service";
 
 function Account() {
     const [{ wallet }, , disconnect] = useConnectWallet();
+
+    const disconnectCurrentWallet = async (wallet: WalletState) => {
+        await disconnect(wallet);
+        SmartContractService.removeCurrentWalletFromConnectedWallets(wallet);
+    };
+
     return (
         <>
             <Container>
@@ -36,7 +44,8 @@ function Account() {
                             </>
                         )}
                         <Center>
-                            <Button color={"red"} onClick={() => disconnect(wallet)}>Disconnect</Button>
+                            <Button color={"red"} onClick={() => disconnectCurrentWallet(wallet)}>Se
+                                déconnecter</Button>
                         </Center>
                     </>
                 ) : (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import Connect from "./components/metamask/connected/Connect";
 import { Route, Routes } from "react-router-dom";
@@ -11,15 +11,27 @@ import SessionHistoryHome from "./components/sessions/history/SessionHistoryHome
 import AccountHome from "./components/user/account/AccountHome";
 import SessionDetailsHome from "./components/sessions/sessions/details/SessionDetailsHome";
 import SessionClosedHome from "./components/sessions/history/details/SessionClosedHome";
-import { useConnectWallet } from "@web3-onboard/react";
+import { useConnectWallet, useWallets } from "@web3-onboard/react";
 import SessionCreateHome from "./components/sessions/sessions/create/SessionCreateHome";
 import "dayjs/locale/fr";
 import DonationHome from "./components/donation/DonationHome";
+import { SmartContractService } from "./smart-contracts/smart-contract-service";
 
 function App() {
-    const [{ wallet, connecting }] = useConnectWallet();
+    const [{ wallet, connecting }, connect] = useConnectWallet();
+    const connectedWallets = useWallets();
 
-    // Get element with id account-center-with-notify and unshow it 5 seconds after the page is loaded
+    useEffect(() => {
+        SmartContractService.setConnectedWalletsInStorage(connectedWallets);
+    }, [wallet, connectedWallets]);
+
+    useEffect(() => {
+        const previouslyConnectedWalletLabels = SmartContractService.getConnectedWalletsFromStorage();
+        if (previouslyConnectedWalletLabels?.length) {
+            SmartContractService.connectWalletFromStorage(previouslyConnectedWalletLabels, connect).then((connectedWallet) => console.log("Wallet connected from local storage : ", connectedWallet));
+        }
+    }, [connect]);
+
     if (connecting) {
         return (
             <Container className="App">

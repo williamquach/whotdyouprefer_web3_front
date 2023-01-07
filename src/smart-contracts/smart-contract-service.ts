@@ -1,33 +1,10 @@
 import voteContractAbi from "./vote_abi.json";
 import donationContractAbi from "./donation_abi.json";
 import { Contract, ethers } from "ethers";
-import { WalletState } from "@web3-onboard/core";
+import { ConnectOptions, WalletState } from "@web3-onboard/core";
 import injectedModule from "@web3-onboard/injected-wallets";
 import { init } from "@web3-onboard/react";
 
-// interface Wallet {
-//     wallets: WalletState[];
-//     addWallet: (wallet: WalletState) => void;
-//     removeWallet: (wallet: WalletState) => void;
-//     deleteWallets: () => void;
-// }
-
-// export const useWalletStore = create<Wallet>()(
-//     devtools(
-//         persist(
-//             (set) => {
-//                 return {
-//                     wallets: [],
-//                     addWallet: (wallet: WalletState) => set((state) => ({ wallets: [...state.wallets, wallet] })),
-//                     removeWallet: (wallet: WalletState) => set((state) => ({ wallets: state.wallets.filter((w) => w !== wallet) })),
-//                     deleteWallets: () => set(() => ({ wallets: [] }))
-//                 };
-//             },
-//             {
-//                 name: "wallets"
-//             }
-//         )
-//     ));
 
 // const MAINNET_RPC_URL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
 // const MAINNET_RPC_URL = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`;
@@ -49,9 +26,83 @@ export class SmartContractService {
                     label: "Ethereum Mainnet",
                     rpcUrl: MAINNET_RPC_URL
                 }
-            ]
+            ],
+            accountCenter: {
+                desktop: {
+                    position: "bottomLeft",
+                    enabled: true
+                },
+                mobile: {
+                    position: "bottomLeft",
+                    enabled: true
+                }
+            },
+            notify: {
+                desktop: {
+                    enabled: true,
+                    transactionHandler: transaction => {
+                        console.log("Transaction handler");
+                        console.log({ transaction });
+                        if (transaction.eventCode === "txPool") {
+                            return {
+                                type: "success",
+                                message: "Your transaction from #1 DApp is in the mempool"
+                            };
+                        }
+                    },
+                    position: "bottomLeft"
+                },
+                mobile: {
+                    enabled: true,
+                    transactionHandler: transaction => {
+                        console.log({ transaction });
+                        if (transaction.eventCode === "txPool") {
+                            return {
+                                type: "success",
+                                message: "Your transaction from #1 DApp is in the mempool"
+                            };
+                        }
+                    },
+                    position: "topRight"
+                }
+            }
         });
     }
+
+    static getConnectedWalletsFromStorage(): any[] {
+        return JSON.parse(
+            window.localStorage.getItem("connectedWallets") || "[]"
+        );
+    }
+
+    static setConnectedWalletsInStorage(connectedWallets: WalletState[]): void {
+        if (connectedWallets.length > 0) {
+            window.localStorage.setItem(
+                "connectedWallets",
+                JSON.stringify(connectedWallets.map(
+                    (wallet) => wallet.label
+                ))
+            );
+        }
+    }
+
+    static removeCurrentWalletFromConnectedWallets(wallet: WalletState | null): void {
+        if (wallet) {
+            const connectedWallets = JSON.parse(window.localStorage.getItem("connectedWallets") || "[]");
+            const newConnectedWallets = connectedWallets.filter((connectedWallet: string) => connectedWallet !== wallet.label);
+            window.localStorage.setItem("connectedWallets", JSON.stringify(newConnectedWallets));
+        }
+    }
+
+    static async connectWalletFromStorage(previouslyConnectedWalletLabels: any[], connect: (options?: ConnectOptions) => Promise<WalletState[]>) {
+        const walletConnected = await connect({
+            autoSelect: previouslyConnectedWalletLabels[0]
+        });
+        if (walletConnected) {
+            return previouslyConnectedWalletLabels[0];
+        }
+    }
+
 
     static loadVoteContract(wallet: WalletState | null): { voteContract: Contract } {
         if (this.VoteContract) {
