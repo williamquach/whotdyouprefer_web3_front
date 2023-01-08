@@ -1,13 +1,10 @@
-import { SessionClosedChoice } from "./session-closed-choice.model";
+import { Session } from "./session.model";
 
 export class SessionClosed {
     constructor(
-    public sessionId: number,
-    public label: string,
-    public expiresAt: Date,
-    public userChoiceId: number,
-    public choices: SessionClosedChoice[] = [],
-    public description?: string
+        public session: Session,
+        public result: number[][],
+        public choiceIdWinner: number
     ) {
     }
 }

@@ -26,11 +26,38 @@ function SessionCreate() {
 
     useEffect(() => {
         setTimeout(() => {
-            setNowDatePlus1Day(dayjs().add(24, "hour").toDate());
+            setNowDatePlus1Day(dayjs().add(24, "seconds").toDate());
         }, 1000);
     }, [nowDatePlus1Day]);
 
     const createSession = async () => {
+        if (!sessionName) {
+            showNotification({
+                title: "Erreur",
+                message: "Veuillez remplir le nom de la session",
+                color: "red",
+                icon: <IconX size={24} />
+            });
+            return;
+        }
+        if (dayjs(sessionEndDate).hour(dayjs(sessionEndTime).hour()).minute(dayjs(sessionEndTime).minute()).isBefore(dayjs())) {
+            showNotification({
+                title: "Erreur",
+                message: "La date de fin de la session doit être dans le futur",
+                color: "red",
+                icon: <IconX size={24} />
+            });
+            return;
+        }
+        if (sessionChoices.some((choice) => !choice)) {
+            showNotification({
+                title: "Erreur",
+                message: "Veuillez remplir tous les choix",
+                color: "red",
+                icon: <IconX size={24} />
+            });
+            return;
+        }
         setSessionCreationError(false);
         if (wallet) {
             const { voteContract } = SmartContractService.loadVoteContract(wallet);

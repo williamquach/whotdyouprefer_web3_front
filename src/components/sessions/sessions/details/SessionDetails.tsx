@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Center, Chip, Container, LoadingOverlay, Menu } from "@mantine/core";
+import { Alert, Button, Center, Chip, Container, LoadingOverlay, Menu } from "@mantine/core";
 import "./Session.css";
 import { orderSessionChoicesByIdAsc } from "../../../../models/sessions/session-choice.model";
 import { Session } from "../../../../models/sessions/session.model";
@@ -10,7 +10,7 @@ import { SessionService } from "../../../../services/session.service";
 import { useConnectWallet } from "@web3-onboard/react";
 import dayjs from "dayjs";
 import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons";
+import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons";
 import Label = Menu.Label;
 
 function SessionDetails(props: { sessionId: number }) {
@@ -26,6 +26,17 @@ function SessionDetails(props: { sessionId: number }) {
     const [preferences, setPreferences] = useState<(number | undefined)[]>(Array(4).fill(undefined));
     const [voteIsBeingSent, setVoteIsBeingSent] = useState<boolean>(false);
     const [voteCreationError, setVoteCreationError] = useState<boolean>();
+
+    const [sessionIsClosed, setSessionIsClosed] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Check if session is closed with is expiredAt date
+        if (session) {
+            const now = dayjs();
+            const sessionExpiredAt = dayjs(session.expiresAt);
+            setSessionIsClosed(now.isAfter(sessionExpiredAt) || now.isBefore(sessionExpiredAt));
+        }
+    }, [session]);
 
     const findSessionById = async () => {
         if (wallet) {
@@ -72,6 +83,15 @@ function SessionDetails(props: { sessionId: number }) {
             alert("Session not set ???? Why you vote ? What are you doing ????");
             return;
         }
+        if (dayjs().isAfter(dayjs(session.expiresAt))) {
+            showNotification({
+                title: "Impossible",
+                message: "La session de vote est terminée",
+                color: "red",
+                icon: <IconX size={24} />
+            });
+            return;
+        }
         if (preferences.length === 0) {
             showNotification({
                 title: "Attention",
@@ -97,7 +117,13 @@ function SessionDetails(props: { sessionId: number }) {
         const formattedPreferences = preferences.map((preference) => {
             if (preference == undefined) {
                 setVoteIsBeingSent(false);
-                throw new Error("A preference is undefined bro");
+                showNotification({
+                    title: "Erreur",
+                    message: "Vous devez faire un choix pour chaque préférence",
+                    color: "red",
+                    icon: <IconX size={24} />
+                });
+                throw new Error("You must choose a preference for each choice");
             }
             return preference;
         });
@@ -106,6 +132,7 @@ function SessionDetails(props: { sessionId: number }) {
             const { voteContract } = SmartContractService.loadVoteContract(wallet);
             await SessionService.vote(voteContract, session.sessionId, formattedPreferences.map((preference) => preference));
             SmartContractService.listenToEvent(voteContract, "NewVote", (voteId, sessionId, choiceIds) => {
+                console.log("New vote", voteId, sessionId, choiceIds);
                 if (choiceIds.length > 0) {
                     showNotification({
                         title: "Vote envoyé",
@@ -220,6 +247,14 @@ function SessionDetails(props: { sessionId: number }) {
                         )}
                         <Container className="Session-Details-Container">
                             <Center>
+                                {sessionIsClosed && (
+                                    <Alert icon={<IconAlertCircle size={16} />} title="Attention !" color="red">
+                                        Cette session est terminée, vous ne pouvez plus voter. Allez voir les résultats
+                                        dans l'onglet historique
+                                    </Alert>
+                                )}
+                            </Center>
+                            <Center>
                                 <p className="Session-Details-Description">
                                     <em>
                                         Votez en classant les choix dans l'ordre de vos préférences en cliquant sur les
@@ -238,7 +273,7 @@ function SessionDetails(props: { sessionId: number }) {
                             </Center>
                             {orderSessionChoicesByIdAsc(session.choices).map((choice, preferenceIndex) => (
                                 <>
-                                    <Center>
+                                    <Center key={choice.id}>
                                         <Label>
                                             Préférence {preferenceIndex + 1} :
                                         </Label>
