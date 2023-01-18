@@ -34,7 +34,7 @@ function SessionDetails(props: { sessionId: number }) {
         if (session) {
             const now = dayjs();
             const sessionExpiredAt = dayjs(session.expiresAt);
-            setSessionIsClosed(now.isAfter(sessionExpiredAt) || now.isBefore(sessionExpiredAt));
+            setSessionIsClosed(now.isAfter(sessionExpiredAt) || now.isSame(sessionExpiredAt));
         }
     }, [session]);
 
@@ -247,10 +247,22 @@ function SessionDetails(props: { sessionId: number }) {
                         )}
                         <Container className="Session-Details-Container">
                             <Center>
-                                {sessionIsClosed && (
+
+                                {!session.hasVoted && sessionIsClosed && (
                                     <Alert icon={<IconAlertCircle size={16} />} title="Attention !" color="red">
                                         Cette session est terminée, vous ne pouvez plus voter. Allez voir les résultats
                                         dans l'onglet historique
+                                    </Alert>
+                                )}
+                                {session.hasVoted && (
+                                    <Alert icon={<IconAlertCircle size={16} />} title="Attention !" color="red">
+                                        Vous avez déjà voté pour cette session, vous ne pouvez plus voter.
+                                        {sessionIsClosed && (
+                                            <p> De plus cette session est terminée, vous ne pouvez plus voter. Allez
+                                                voir
+                                                les résultats dans l'onglet historique
+                                            </p>
+                                        )}
                                     </Alert>
                                 )}
                             </Center>
@@ -301,7 +313,7 @@ function SessionDetails(props: { sessionId: number }) {
                             <Button
                                 className="Vote-Button"
                                 onClick={sendVote}
-                                disabled={session?.hasVoted}
+                                disabled={session?.hasVoted || voteIsBeingSent}
                             >
                                 <Center>
                                     {session.hasVoted && (<> <em>Vous avez déjà voté pour cette session</em> </>)}

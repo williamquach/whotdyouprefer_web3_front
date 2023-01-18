@@ -20,6 +20,8 @@ import { SmartContractService } from "./smart-contracts/smart-contract-service";
 function App() {
     const [{ wallet, connecting }, connect] = useConnectWallet();
     const connectedWallets = useWallets();
+    console.log("Wallet from useConnectWallet", wallet);
+    console.log("Connected wallets", connectedWallets);
 
     useEffect(() => {
         SmartContractService.setConnectedWalletsInStorage(connectedWallets);

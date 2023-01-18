@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Center, Chip, Container, Divider, LoadingOverlay, Menu, Table, Text } from "@mantine/core";
+import {
+    Alert,
+    Button,
+    Center,
+    Chip,
+    Container,
+    Divider,
+    LoadingOverlay,
+    Menu,
+    Table,
+    Text,
+    Title
+} from "@mantine/core";
 import "./SessionClosed.css";
 import { useNavigate } from "react-router-dom";
 import { navigateTo } from "../../../../utils/redirect.util";
@@ -30,6 +42,7 @@ function SessionClosedDetails(props: { sessionId: number }) {
             const { voteContract } = SmartContractService.loadVoteContract(wallet);
             try {
                 const foundClosedSession = await SessionService.findClosedSessionById(voteContract, props.sessionId);
+                console.log("foundClosedSession", foundClosedSession);
                 if (!foundClosedSession) throw new Error(`Session closed with id ${props.sessionId} not found`);
                 setClosedSession(foundClosedSession);
                 setPreferenceCount(foundClosedSession.session.choices.length);
@@ -54,7 +67,7 @@ function SessionClosedDetails(props: { sessionId: number }) {
     function shouldDisableChoice(preferenceIndex: number, index: number) {
         if (closedSession) {
             const choiceIdInUserVote = closedSession.session.vote.choiceIds[preferenceIndex];
-            const found = closedSession.session.choices.find((choice) => choice.id.toString() === choiceIdInUserVote.toString());
+            const found = closedSession.session.choices.find((choice) => choice.id.toString() === choiceIdInUserVote?.toString());
             if (found) {
                 return closedSession.session.hasVoted && index != closedSession.session.choices.indexOf(found);
             }
@@ -108,21 +121,40 @@ function SessionClosedDetails(props: { sessionId: number }) {
                         <Container className="Session-Details-Container">
                             <Center>
                                 <h2>
-                                    Gagnant :
+                                    Gagnant{closedSession.choiceIdWinners?.length > 1 ? "s" : ""} :{" "}
                                 </h2>
                                 <Chip.Group
                                     className={"Session-Choices-Preferences"}
                                     key={0}
                                     position="center" multiple={false}
-                                    value={closedSession.choiceIdWinner.toString()}
+                                    value={closedSession.choiceIdWinners.toString()}
                                 >
-                                    <Chip
-                                        color="green"
-                                        style={{ marginLeft: "1vw" }}
-                                        value={closedSession.choiceIdWinner.toString()}
-                                    >
-                                        {closedSession.session.choices.find((choice, index) => index.toString() === closedSession?.choiceIdWinner.toString())?.label}
-                                    </Chip>
+                                    {closedSession.choiceIdWinners.length == 0 && (
+                                        <>
+                                            <Title order={4} color={"red"}>Aucun gagnant</Title>
+                                        </>
+                                    )}
+                                    {closedSession.choiceIdWinners.map((choiceId) => (
+                                        <>
+                                            <Chip
+                                                color="green"
+                                                style={{ marginLeft: "1vw" }}
+                                                key={choiceId}
+                                                value={closedSession.choiceIdWinners.toString()}
+                                            >
+                                                {closedSession.session.choices.find((choice) => choice.id.toString() === choiceId.toString())?.label}
+                                            </Chip>
+                                        </>
+                                    ))}
+                                    {/*<Chip*/}
+                                    {/*    color="green"*/}
+                                    {/*    style={{ marginLeft: "1vw" }}*/}
+                                    {/*    value={closedSession.choiceIdWinners.toString()}*/}
+                                    {/*>*/}
+                                    {/*{closedSession.session.choices.find((choice, index) => index.toString() === closedSession?.choiceIdWinners.toString())?.label}*/}
+                                    {/*    /!* Display the choice of multiple winners *!/*/}
+                                    {/*    {closedSession.session.choices.filter((choice, index) => closedSession?.choiceIdWinners.includes(choice.id)).map((choice) => choice.label).join(", ")}*/}
+                                    {/*</Chip>*/}
                                 </Chip.Group>
                             </Center>
                             <Center>
@@ -163,7 +195,7 @@ function SessionClosedDetails(props: { sessionId: number }) {
                                     </em>
                                     <br />
                                     <em>
-                                        (voir
+                                        (voir :
                                         <a
                                             href="https://fr.wikipedia.org/wiki/Syst%C3%A8me_%C3%A9lectoral_%C3%A0_pr%C3%A9f%C3%A9rences_multiples_ordonn%C3%A9es">Système
                                             électoral à préférences multiples ordonnées

@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardSection, Center, Text } from "@mantine/core";
+import { Card, CardSection, Center, Divider, Text } from "@mantine/core";
 import "./SessionHistory.css";
 import { Session } from "../../../models/sessions/session.model";
 import { navigateTo } from "../../../utils/redirect.util";
@@ -34,6 +34,7 @@ function SessionUserIsCreatorInHistory(props: { session: Session }) {
                 </Text>
 
                 <Text mt="xs" color="dimmed" size="sm">
+                    <Divider my="sm" variant="solid" />
                     <strong><em>Vous êtes le créateur de cette session 🫵</em></strong>
                 </Text>
             </Card>

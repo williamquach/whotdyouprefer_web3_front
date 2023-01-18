@@ -202,6 +202,7 @@ function SessionCreate() {
                                 className={"Session-Form-Field"}
                                 color="teal"
                                 onClick={createSession}
+                                disabled={sessionIsBeingCreated}
                             >
                                 Créer la session
                             </Button>

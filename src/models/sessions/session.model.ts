@@ -1,5 +1,6 @@
 import { SessionChoice } from "./session-choice.model";
 import { SessionVote } from "./session-vote.model";
+import { SessionClosed } from "./session-closed.model";
 
 export class Session {
     constructor(
@@ -16,4 +17,8 @@ export class Session {
 
 export const orderSessionsFromNewestToOldest = (sessions: Session[]): Session[] => {
     return sessions.sort((a, b) => b.expiresAt.getTime() - a.expiresAt.getTime());
+};
+
+export const orderSessionsClosedFromNewestToOldest = (sessions: SessionClosed[]): SessionClosed[] => {
+    return sessions.sort((a, b) => b.session.expiresAt.getTime() - a.session.expiresAt.getTime());
 };

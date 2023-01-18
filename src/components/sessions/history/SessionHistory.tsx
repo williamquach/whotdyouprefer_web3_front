@@ -58,9 +58,9 @@ function SessionHistory() {
                         )}
                         {closedSessionsWhereUserHasVotedOn.length > 0 && (
                             <Grid className="Session-Cards" gutter="lg">
-                                {orderSessionsFromNewestToOldest(closedSessionsWhereUserHasVotedOn).map((session) => (
-                                    <Col md={6} lg={6} key={session.sessionId}>
-                                        <SessionUserHasVotedOnInHistory session={session} />
+                                {orderSessionsFromNewestToOldest(closedSessionsWhereUserHasVotedOn).map((closedSession) => (
+                                    <Col md={6} lg={6} key={closedSession.sessionId}>
+                                        <SessionUserHasVotedOnInHistory session={closedSession} />
                                     </Col>
                                 ))}
                             </Grid>
